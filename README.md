@@ -11,14 +11,14 @@ English version:
 
 　[Developer Guide](doc/DeveloperGuide/DeveloperGuide.md)
 
-　[Guidance SDK API Documentation](doc/Guidance_SDK_API.pdf)
+　[Guidance SDK API Documentation](doc/Guidance_SDK_API.md)
 
 
 中文版本：
 
 　[开发者指南](doc/开发者指南/开发者指南.md)　
 
-　[Guidance SDK API Documentation](doc/Guidance_SDK_API.pdf)
+　[Guidance SDK API Documentation](doc/Guidance_SDK_API.md)
 
 
 Structure
