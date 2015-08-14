@@ -139,9 +139,9 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 	- Copy _DJI\_guidance.h_ to "header file path".
 
 	- Add the library in the Makefile of your project as shown below.	
-	
-		LDFLAGS = -Wl,-rpath,./ -lpthread -lrt -L./ -L/usr/local/lib/ -l **DJI\_guidance** -lusb-1.0
-	
+	```
+	LDFLAGS = -Wl,-rpath,./ -lpthread -lrt -L./ -L/usr/local/lib/ -l **DJI\_guidance** -lusb-1.0
+	```
 
 
 3. **Compile the example project.**
