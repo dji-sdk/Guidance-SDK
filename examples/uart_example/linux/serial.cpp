@@ -127,13 +127,13 @@ int connect_serial(char port, int baudrate)
 	g_sdk_uart_fd = open(arm_path[port], O_RDWR | O_NOCTTY);
 	if (g_sdk_uart_fd < 0)
 	{
-		printf("open UART ERROR ???\n");
+		printf("open UART ERROR!\n");
 		return -1;
 	}
-	printf("open uart ok! fd:%d\n", g_sdk_uart_fd);
+	printf("open uart ok!\n");
 	if (uart_config(g_sdk_uart_fd, baudrate, 8, 'N', 1) < 0)
 	{
-		printf("UART config ERROR ???\n");
+		printf("UART config ERROR!\n");
 		return -1;
 	}
 
