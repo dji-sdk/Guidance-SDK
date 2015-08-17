@@ -30,6 +30,8 @@ Structure
 -	**lib**: Library files for Windows
 -	**so**: Library files for Linux
 
+Also notice that, to enable fast download for ROS users, we have a separate ROS repo with much smaller size: [GuidanceSDKROS](https://github.com/dji-sdk/GuidanceSDKROS).
+
 Usage
 =========
 ### Windows ###
