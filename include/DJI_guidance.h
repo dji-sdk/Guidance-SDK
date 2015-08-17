@@ -97,7 +97,7 @@ typedef struct _image_data
 	unsigned int     time_stamp;	                                  /**< time stamp of image captured in ms */
 	char             *m_greyscale_image_left[CAMERA_PAIR_NUM];	      /**< greyscale image of left camera */
 	char             *m_greyscale_image_right[CAMERA_PAIR_NUM];   	  /**< greyscale image of right camera */
-	char             *m_depth_image[CAMERA_PAIR_NUM];	              /**< depth image */
+	char             *m_depth_image[CAMERA_PAIR_NUM];	              /**< depth image in meters */
 }image_data;
 
 /**
@@ -108,7 +108,7 @@ typedef struct _ultrasonic_data
 {
 	unsigned int     frame_index;	                        /**< corresponse frame index */
 	unsigned int     time_stamp;	                        /**< time stamp of corresponse image captured in ms */
-	unsigned short   ultrasonic[CAMERA_PAIR_NUM];	        /**< distance */
+	unsigned short   ultrasonic[CAMERA_PAIR_NUM];	        /**< distance in mm */
 	unsigned short   reliability[CAMERA_PAIR_NUM];	        /**< reliability of the distance data */
 }ultrasonic_data;
 
@@ -120,20 +120,20 @@ typedef struct _velocity
 {
 	unsigned int     frame_index;	          /**< corresponse frame index */
 	unsigned int     time_stamp;	          /**< time stamp of corresponse image captured in ms */
-	short            vx;	                  /**< velocity of x */
-	short            vy;	                  /**< velocity of y */
-	short            vz;	                  /**< velocity of z */
+	short            vx;	                  /**< velocity of x in mm/s */
+	short            vy;	                  /**< velocity of y in mm/s */
+	short            vz;	                  /**< velocity of z in mm/s */
 }velocity;
 
 /**
 *@struct  obstacle_distance
-*@brief Define obstacle distance
+*@brief Define obstacle distance in cm
 */
 typedef struct _obstacle_distance
 {
 	unsigned int     frame_index;	                /**< corresponse frame index */
 	unsigned int     time_stamp;	                /**< time stamp of corresponse image captured in ms */
-	unsigned short   distance[CAMERA_PAIR_NUM];     /**< distance of obstacle */
+	unsigned short   distance[CAMERA_PAIR_NUM];     /**< distance of obstacle in cm */
 }obstacle_distance;
 
 /**
@@ -144,9 +144,9 @@ typedef struct _imu
 {
 	unsigned int     frame_index;	          /**< corresponse frame index */
 	unsigned int     time_stamp;	          /**< time stamp of corresponse image captured in ms */
-	float            acc_x;	                  /**< acceleration of x */
-	float            acc_y;	                  /**< acceleration of y */
-	float            acc_z;	                  /**< acceleration of z */
+	float            acc_x;	                  /**< acceleration of x m/s^2 */
+	float            acc_y;	                  /**< acceleration of y m/s^2 */
+	float            acc_z;	                  /**< acceleration of z m/s^2 */
 
 	float            q[4];	                  /**< attitude data */
 }imu;
