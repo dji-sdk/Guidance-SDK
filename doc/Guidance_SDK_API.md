@@ -254,11 +254,11 @@ enum e_sdk_err_code
     e_sdk_no_err = 0,
     e_load_libusb_err,
     e_sdk_not_inited,                  // SDK software is not ready 
-    e_guidance_hardware_not_ready,  // Guidance hardware is not ready 
-    e_disparity_not_allowed,         // if work type is standard, disparity is not allowed to be selected 
-    e_image_frequency_not_allowed, // image frequency must be one of the enum type e_image_data_frequecy 
-    e_config_not_ready,               // get config including the work type flag, before you can select data 
-    e_online_flag_not_ready, // online flag is not ready 
+    e_guidance_hardware_not_ready,     // Guidance hardware is not ready 
+    e_disparity_not_allowed,           // if work type is standard, disparity is not allowed to be selected 
+    e_image_frequency_not_allowed,     // image frequency must be one of the enum type e_image_data_frequecy 
+    e_config_not_ready,                // get config including the work type flag, before you can select data 
+    e_online_flag_not_ready,           // online flag is not ready 
     e_max_sdk_err = 100
 };
 ~~~
@@ -272,11 +272,11 @@ enum e_sdk_err_code
 ~~~
 enum e_vbus_index
 {
-    e_vbus1 = 1,        // logic direction of vbus 
-    e_vbus2 = 2,        // logic direction of vbus 
-    e_vbus3 = 3,        // logic direction of vbus 
-    e_vbus4 = 4,        // logic direction of vbus 
-    e_vbus5 = 0         // logic direction of vbus 
+    e_vbus1 = 1,        // logic direction of vbus
+    e_vbus2 = 2,        // logic direction of vbus
+    e_vbus3 = 3,        // logic direction of vbus
+    e_vbus4 = 4,        // logic direction of vbus
+    e_vbus5 = 0         // logic direction of vbus
 };
 ~~~
 
@@ -319,11 +319,11 @@ typedef int (*user_call_back)( int event_type, int data_len, char *data );
 
 enum e_guidance_event
 {
-    e_image = 0,           // called back when image comes 
+    e_image = 0,            // called back when image comes 
     e_imu,                  // called back when imu comes 
-    e_ultrasonic,          // called back when ultrasonic comes 
+    e_ultrasonic,           // called back when ultrasonic comes 
     e_velocity,             // called back when velocity data comes 
-    e_obstacle_distance,  // called back when obstacle data comes 
+    e_obstacle_distance,    // called back when obstacle data comes 
     e_event_num
 };
 
@@ -331,7 +331,7 @@ enum e_guidance_event
 
 ### image\_data
 
-**Description:** Define image data structure.
+**Description:** Define image data structure. The center of depth image coincides with the corresponding left greyscale image's.
 
 ~~~
 typedef struct _image_data
@@ -346,12 +346,12 @@ typedef struct _image_data
 
 ### ultrasonic\_data
 
-**Description:** Define ultrasonic data structure.
+**Description:** Define ultrasonic data structure. Unit is `mm`.
 
 ~~~
 typedef struct _ultrasonic_data
 {
-    unsigned int     frame_index;   // corresponse frame index 
+    unsigned int     frame_index;    // corresponse frame index 
     unsigned int     time_stamp;     // time stamp of corresponse image captured in ms 
     unsigned short   ultrasonic[CAMERA_PAIR_NUM];    // distance 
     unsigned short   reliability[CAMERA_PAIR_NUM];   // reliability of the distance data 
@@ -360,7 +360,7 @@ typedef struct _ultrasonic_data
 
 ### velocity
 
-**Description:** Define velocity structure.
+**Description:** Define velocity structure. Unit is `mm`.
 
 
 ~~~
@@ -377,7 +377,7 @@ typedef struct _velocity
 
 ### obstacle\_distance
 
-**Description:** Define obstacle distance structure.
+**Description:** Define obstacle distance structure. Unit is `cm`.
 
 ~~~
 typedef struct _obstacle_distance
@@ -390,7 +390,7 @@ typedef struct _obstacle_distance
 
 ### imu
 
-**Description:** Define imu structure.
+**Description:** Define imu structure. Unit of acceleration is `m^2/s`. 
 
 ~~~
 

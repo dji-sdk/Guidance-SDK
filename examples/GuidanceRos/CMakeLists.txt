@@ -7,7 +7,9 @@ project(GuidanceRos)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   cv_bridge
+  std_msgs
   sensor_msgs
+  geometry_msgs
 )
 find_package(OpenCV REQUIRED)
 
@@ -69,6 +71,8 @@ find_package(OpenCV REQUIRED)
 # generate_messages(
 #   DEPENDENCIES
 #   std_msgs  # Or other packages containing msgs
+#   sensor_msgs
+#   geometry_msgs
 # )
 
 ###################################
@@ -167,24 +171,20 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		MESSAGE("-- 64bit detected")
 		link_directories(${PROJECT_SOURCE_DIR}/lib/x64)
 	endif ()
-else()	
+else()
 	MESSAGE("-- Non-linux platform detected but sorry we do not support :D")
 endif ()
 
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "armv7l" )
 	MESSAGE("-- " ${CMAKE_SYSTEM_PROCESSOR} " detected")
 	link_directories(${PROJECT_SOURCE_DIR}/lib/XU3)
-else ()	
+else ()
 endif ()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-#aux_source_directory(${PROJECT_SOURCE_DIR}/src PROJECT_SOURCE)
-# @todo executable output path should be specified;
-#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-
 
 add_executable(GuidanceNode ${PROJECT_SOURCE_DIR}/src/GuidanceNode.cpp ${PROJECT_SOURCE_DIR}/src/DJI_utility.cpp)
 add_executable(GuidanceNodeTest ${PROJECT_SOURCE_DIR}/src/GuidanceNodeTest.cpp)
 
-target_link_libraries(GuidanceNode DJI_guidance ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(GuidanceNode DJI_guidance usb-1.0 ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries(GuidanceNodeTest ${catkin_LIBRARIES} ${OpenCV_LIBS})
