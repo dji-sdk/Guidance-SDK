@@ -1,4 +1,10 @@
 # Developer Guide
+## SDK Package Download
+Guidance SDK is maintained and updated on GitHub.
+
+- [GuidanceSDK](https://github.com/dji-sdk/GuidanceSDK): the complete package, including header file, library files on all platforms, and all documents.
+- [GuidanceSDKROS](https://github.com/dji-sdk/GuidanceSDKROS): the ROS package, including header file, library files on Ubuntu and Odroid XU3.
+
 ## Environment Setup
 ### Windows
 #### Install “DJI\_Guidance” Software
