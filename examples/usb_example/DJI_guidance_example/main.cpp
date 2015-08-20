@@ -33,6 +33,7 @@ e_vbus_index sensor_id = e_vbus1;
 
 DJI_lock    g_lock;
 DJI_event   g_event;
+char		key = 0;
 
 int my_callback(int data_type, int data_len, char *content)
 {
@@ -88,7 +89,7 @@ int my_callback(int data_type, int data_len, char *content)
 #endif
 
 #ifdef HAVE_OPENCV
-		waitKey(1);
+		key = waitKey(1);
 #endif
 
 	}
@@ -139,6 +140,13 @@ int my_callback(int data_type, int data_len, char *content)
 
 int main(int argc, const char** argv)
 {
+	if(argc>1){
+		printf("This is demo program showing data from Guidance.\n\t" 
+			"Type 'a','d','w','s','x' to select sensor direction.\n\t"
+			"Type 'q' to quit.");
+		return 0;
+	}
+
 	reset_config();
 	int err_code = init_transfer();
 	RETURN_IF_ERR( err_code );
@@ -161,9 +169,30 @@ int main(int argc, const char** argv)
 	err_code = start_transfer();
 	RETURN_IF_ERR( err_code );
 
+	// loop for 1000 iterations, i.e. 50 seconds when frequency is 20Hz
 	for ( int j = 0; j < 1000; ++j )
 	{
 		g_event.wait_event();
+		if (key != 0)
+		{
+			err_code = stop_transfer();
+			RETURN_IF_ERR(err_code);
+			reset_config();
+
+			if (key == 'q') break;
+			if (key == 'w') sensor_id = e_vbus1;
+			if (key == 'd') sensor_id = e_vbus2;
+			if (key == 'x') sensor_id = e_vbus3;
+			if (key == 'a') sensor_id = e_vbus4;	   
+			if (key == 's') sensor_id = e_vbus5;
+
+			select_greyscale_image(sensor_id, true);
+			select_greyscale_image(sensor_id, false);
+			select_depth_image(sensor_id);
+
+			err_code = start_transfer();
+			RETURN_IF_ERR(err_code);
+		}
 	}
 
 	err_code = stop_transfer();

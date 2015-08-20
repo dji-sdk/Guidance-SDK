@@ -7,8 +7,8 @@ Guidance SDK is maintained and updated on GitHub.
 
 ## Environment Setup
 ### Windows
-#### Install “DJI\_Guidance” Software
-Install “DJI\_Guidance” software firstly, which provides the USB driver under Windows platform. Restart your PC after installation, there will be **“DJI, Inc. - Guidance”** in Device Manager as follows, which indicates the installation is successful.
+#### Install “Guidance Assistant” Software
+Install “Guidance Assistant” software firstly, which provides the USB driver under Windows platform. Restart your PC after installation, there will be **“DJI, Inc. - Guidance”** in Device Manager when Guidance is powered and connected to PC, which indicates the installation is successful.
 
   ![Alt text](./1.png) 
 
@@ -20,9 +20,9 @@ Install **USB\_TO\_RS232** driver if you want to use SDK via UART. Notice that G
 ---
 
 #### Activate and Subscribe Data
->*Assume that “DJI-Guidance” software has been correctly installed on Windows.* 
+>*Assume that “Guidance Assistant” software has been correctly installed on Windows.* 
 
--	Connect Guidance to PC and power on. Open the “DJI-Guidance” software, wait until the light on the left-bottom green up and switch to **“DIY”** mode on the **view** page.
+-	Connect Guidance to PC and power it on. Open the “Guidance Assistant” software, wait until the light on the left-bottom green up and switch to **“DIY”** mode on the **view** page.
 
  ![Alt text](./2.png) 
 
@@ -36,7 +36,7 @@ Install **USB\_TO\_RS232** driver if you want to use SDK via UART. Notice that G
 
 -	Close the software and restart Guidance to enable configure works. 
 
->*Notice: If you do not close the software DJI\_Guidance, you will not be able to use Guidance SDK as the connection to Guidance Core is occupied.* 
+>*Notice: If you do not close the software Guidance Assistant, you will not be able to use Guidance SDK as the connection to Guidance Core is occupied.* 
 
 ---
 
@@ -63,8 +63,8 @@ For example:
 
 ---
 
-#### Place DJI\_Guidance.dll Properly
-Remember to copy corresponding DJI\_Guidance.dll to **/PATH/TO/YOUR/EXE**. Of course .dll, .h and .lib should be placed at correct places too.
+#### Place DJI\_guidance.dll Properly
+Remember to copy corresponding DJI\_guidance.dll to **/PATH/TO/YOUR/EXE**. Of course .dll, .h and .lib should be placed at correct places too.
 
  ![Alt text](./6.png) 
 
@@ -89,7 +89,7 @@ Linux includes **USB** to **UART** driver by default.
 ---
 
 #### Activate and Subscribe Data 
-Refers to **Install “DJI\_Guidance” software** in Windows
+Refers to **Install “Guidance Assistant” software** in Windows
 
 ---
  
@@ -123,13 +123,13 @@ For example:
 
 ---
 
-#### Place DJI\_Guidance.so Properly
-Copy corresponding **libDJI\_Guidance.so** to **/usr/local/lib**.
+#### Place DJI\_guidance.so Properly
+Copy corresponding **libDJI\_guidance.so** to **/usr/local/lib**.
 
 For example: 
 
 
-	>> sudo cp libDJI_Guidance.so /usr/local/lib
+	>> sudo cp libDJI_guidance.so /usr/local/lib
 
 
 ---
@@ -159,11 +159,11 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 -	Make sure Guidance has been connected to PC and green light on Guidance Sensor starts to flicker.
 - 	Check whether USB driver is installed correctly, look up **“Device Manager”** on Windows platform. Otherwise install it by construction in Developer Guide.
 -	Check if UART port is **“COM5”** or you set before.
--	Check if you activated and subscribed the data via “DJI-Guidance” software, and Guidance is set to **“custom mode”**, otherwise refers to Developer Guide.
+-	Check if you activated and subscribed the data via “Guidance Assistant” software, and Guidance is set to **“custom mode”**, otherwise refers to Developer Guide.
 -	Restart the Guidance, if quit improperly last time, i.e. the data transfer thread quit before **stop\_transfer()** and **release\_transfer()**.
 -	Remember to run program by `sudo` in Linux.
 -	Do not run your program until the green light on Guidance Sensor starts to flicker. 
--	Make sure “DJI\_Guidance” software is closed when you are using SDK.
+-	Make sure “Guidance Assistant” software is closed when you are using SDK.
 -	Errors happened at times when running on a virtual machine.  
 
 ---
@@ -178,20 +178,20 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 
 ***Solution:***
 
--	Make sure that the corresponding **DJI\_Guidance.so** is placed in the library path (eg **/usr/local/lib**), or copy **DJI\_Guidance.so** to **/PATH/TO/RUNPATH** if it doesn’t work.
--	Make sure **DJI\_Guidance.so** is compatible to your system.
+-	Make sure that the corresponding **DJI\_guidance.so** is placed in the library path (eg **/usr/local/lib**), or copy **DJI\_guidance.so** to **/PATH/TO/RUNPATH** if it doesn’t work.
+-	Make sure **DJI\_guidance.so** is compatible to your system.
 
 ---
 
-##### Cannot open DJI\_Guidance.dll file
+##### Cannot open DJI\_guidance.dll file
 ***Description:***
 
 
-	Cannot open DJI_Guidance.dll file:No such file or directory.
+	Cannot open DJI_guidance.dll file:No such file or directory.
 
 
 ***Solution:*** 
-Make sure that corresponding **DJI\_Guidance.dll** is placed in the RUNPATH.
+Make sure that corresponding **DJI\_guidance.dll** is placed in the RUNPATH.
 
 ---
 
