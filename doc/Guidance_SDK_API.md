@@ -20,9 +20,7 @@ This section introduces the structure of the Guidance SDK. The SDK is divided in
 ![](./image/Guidance_SDK_API3987.png)
 
 - **Application:** This layer processes data from the HAL layer. It is written by developers.
-
 - **HAL:** This layer packs/parses the data to/from the Driver layer. It is implemented by the sample code (for UART) or SDK library (for USB), e.g. _libDJI\_guidance.so_.
-
 - **Driver:** This layer receives data from the Guidance system through USB/UART. It is implemented by OS or 3rd party libraries, e.g. _libusb_.
 
 ## 2.1 Interface
@@ -293,9 +291,9 @@ enum e_image_data_frequecy
 
 ## user\_callback
 
-**Description:** Call back function prototype.
-**Parameters:** `event_type` use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; `data_len` length of the input data; `data` input data read from GUIDANCE
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Call back function prototype.
+- **Parameters:** `event_type` use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; `data_len` length of the input data; `data` input data read from GUIDANCE
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 typedef int (*user_call_back)( int event_type, int data_len, char *data );
@@ -433,9 +431,9 @@ SDK_API int get_online_status( int online_status[CAMERA_PAIR_NUM] );
 
 ### reset\_config
 
-**Description:** Clear the subscribed configure, if you want to subscribe the different data from last time.
-**Parameters:** NULL
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Clear the subscribed configure, if you want to subscribe the different data from last time.
+- **Parameters:** NULL
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int reset_config ( void );
@@ -444,9 +442,9 @@ SDK_API int reset_config ( void );
 
 ### init\_transfer
 
-**Description:** Initialize the GUIDANCE and connect it to PC.
-**Parameters:** NULL
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Initialize the GUIDANCE and connect it to PC.
+- **Parameters:** NULL
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int init_transfer ( void );
@@ -454,9 +452,9 @@ SDK_API int init_transfer ( void );
 
 ### select\_imu
 
-**Description:** Subscribe to imu.
-**Parameters:** NULL
-**Return:** NULL
+- **Description:** Subscribe to imu.
+- **Parameters:** NULL
+- **Return:** NULL
 
 ~~~ cpp
 SDK_API void select_imu ( void );
@@ -464,9 +462,9 @@ SDK_API void select_imu ( void );
 
 ### select\_ultrasonic
 
-**Description:** Subscribe to ultrasonic.
-**Parameters:** NULL
-**Return:** NULL
+- **Description:** Subscribe to ultrasonic.
+- **Parameters:** NULL
+- **Return:** NULL
 
 ~~~ cpp
 SDK_API void select_ultrasonic ( void );
@@ -474,9 +472,9 @@ SDK_API void select_ultrasonic ( void );
 
 ### select\_velocity
 
-**Description:** Subscribe to velocity data, i.e. velocity of GUIDANCE in body coordinate system.
-**Parameters:** NULL
-**Return:** NULL
+- **Description:** Subscribe to velocity data, i.e. velocity of GUIDANCE in body coordinate system.
+- **Parameters:** NULL
+- **Return:** NULL
 
 ~~~ cpp
 SDK_API void select_velocity ( void );
@@ -485,9 +483,9 @@ SDK_API void select_velocity ( void );
 
 ### select\_obstacle\_distance
 
-**Description:** Subscribe to obstacle distance, i.e. distance from obstacle.
-**Parameters:** NULL
-**Return:** NULL
+- **Description:** Subscribe to obstacle distance, i.e. distance from obstacle.
+- **Parameters:** NULL
+- **Return:** NULL
 
 
 ~~~ cpp
@@ -497,10 +495,10 @@ SDK_API void select_obstacle_distance ( void );
 
 ### set\_image\_frequecy
 
-**Description:** Set frequency of image transfer.
+- **Description:** Set frequency of image transfer.
 (**Note:** The bandwidth of USB is limited. If you subscribe too much images (greyscale image or depth image), the frequency should be relatively small, otherwise the SDK cannot guarantee the continuity of image transfer.)
-**Parameters:** `frequency` the frequency of image transfer
-**Return:** `error code`. Non-zero if error occurs.
+- **Parameters:** `frequency` the frequency of image transfer
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int set_image_frequecy ( e_image_data_frequecy frequecy );
@@ -508,9 +506,9 @@ SDK_API int set_image_frequecy ( e_image_data_frequecy frequecy );
 
 ### select\_depth\_image
 
-**Description:** Subscribe to depth image data.
-**Parameters:** `camera_pair_index` index of camera pair selected.
-**Return:** `NULL`
+- **Description:** Subscribe to depth image data.
+- **Parameters:** `camera_pair_index` index of camera pair selected.
+- **Return:** `NULL`
 
 
 ~~~ cpp
@@ -519,9 +517,9 @@ SDK_API void select_depth_image ( e_vbus_index camera_pair_index );
 
 ### select\_greyscale\_image
 
-**Description:** Subscribe to rectified grey image data.
-**Parameters:** `camera_pair_index` index of camera pair selected; `is_left` whether the image data selected is left.
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Subscribe to rectified grey image data.
+- **Parameters:** `camera_pair_index` index of camera pair selected; `is_left` whether the image data selected is left.
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int select_greyscale_image ( e_vbus_index camera_pair_index, bool is_left );
@@ -529,9 +527,9 @@ SDK_API int select_greyscale_image ( e_vbus_index camera_pair_index, bool is_lef
 
 ### set\_sdk\_event\_handler
 
-**Description:** Set callback, when data from GUIDANCE comes, it will be called by transfer thread.
-**Parameters:** `handler` pointer to callback function.
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Set callback, when data from GUIDANCE comes, it will be called by transfer thread.
+- **Parameters:** `handler` pointer to callback function.
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int set_sdk_event_handler ( user_call_back handler );
@@ -539,9 +537,9 @@ SDK_API int set_sdk_event_handler ( user_call_back handler );
 
 ### start\_transfer
 
-**Description:** Send message to GUIDANCE to start data transfer.
-**Parameters:** NULL .
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Send message to GUIDANCE to start data transfer.
+- **Parameters:** NULL .
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int start_transfer ( void );
@@ -549,9 +547,9 @@ SDK_API int start_transfer ( void );
 
 ### stop\_transfer
 
-**Description:** Send message to GUIDANCE to stop data transfer.
-**Parameters:** NULL .
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Send message to GUIDANCE to stop data transfer.
+- **Parameters:** NULL .
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int stop_transfer ( void );
@@ -559,9 +557,9 @@ SDK_API int stop_transfer ( void );
 
 ### release\_transfer
 
-**Description:** Release the data transfer thread.
-**Parameters:** NULL .
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Release the data transfer thread.
+- **Parameters:** NULL .
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int release_transfer ( void );
@@ -569,12 +567,12 @@ SDK_API int release_transfer ( void );
 
 ### get\_online\_status
 
-**Description:** Get the online status of GUIDANCE sensors.
-**Parameters:** `online\_status[CAMERA\_PAIR\_NUM]` online status of GUIDANCE sensors
-**Return:** `error code`. Non-zero if error occurs.
+- **Description:** Get the online status of GUIDANCE sensors.
+- **Parameters:** `online\_status[CAMERA\_PAIR\_NUM]` online status of GUIDANCE sensors
+- **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
 SDK_API int get_online_status (int online_status[CAMERA_PAIR_NUM] );
 ~~~
 
-**Notes** : These are only used for USB transfer type. Please reference the protocol of Section 2.1.2 when using UART transfer type.
+**Notes** : These are only used for USB transfer type. Please reference the protocol of Section 2.1.2 and also the example code of `uart_example` when using UART transfer type.
