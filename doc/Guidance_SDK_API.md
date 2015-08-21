@@ -1,4 +1,3 @@
-#
 # 1 Background
 
 This guide assumes that you have
@@ -13,7 +12,7 @@ and you are:
 
 - or familiar with Windows programming and Microsoft Visual Studio.
 
-#
+
 # 2 Introduction
 
 This section introduces the structure of the Guidance SDK. The SDK is divided into three layers:
@@ -117,7 +116,6 @@ Each of the supported data types is described below.
   
   **Notes:** In order to achieve best performance, it is suggested that large data (e.g. images) be copied instead of processing the data in-place, if the received data will be processed for a long time.
 
-#
 # 3 Getting Started
 
 Guidance SDK have provided examples to get data from Guidance system. This section guides you how to execute these examples.
@@ -241,35 +239,35 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 
 	![](./image/Guidance_SDK_API11973.png)
 
-#
+
 # 4 Data Structures
 
-### e\_sdk\_err\_code
+## e\_sdk\_err\_code
 
 **Description:** Define error code of SDK.
 
-~~~
+~~~ cpp
 enum e_sdk_err_code
 {
-    e_sdk_no_err = 0,
-    e_load_libusb_err,
-    e_sdk_not_inited,                  // SDK software is not ready 
-    e_guidance_hardware_not_ready,     // Guidance hardware is not ready 
-    e_disparity_not_allowed,           // if work type is standard, disparity is not allowed to be selected 
-    e_image_frequency_not_allowed,     // image frequency must be one of the enum type e_image_data_frequecy 
-    e_config_not_ready,                // get config including the work type flag, before you can select data 
-    e_online_flag_not_ready,           // online flag is not ready 
-    e_max_sdk_err = 100
+    e_sdk_no_err = 0,					// Succeed with no error.
+    e_load_libusb_err,					// Load libusb library error.
+    e_sdk_not_inited,					// SDK software is not ready 
+    e_guidance_hardware_not_ready,		// Guidance hardware is not ready 
+    e_disparity_not_allowed,			// If work type is standard, disparity is not allowed to be selected 
+    e_image_frequency_not_allowed,		// Image frequency must be one of the enum type e_image_data_frequecy 
+    e_config_not_ready,					// Get config including the work type flag, before you can select data 
+    e_online_flag_not_ready,			// Online flag is not ready 
+    e_max_sdk_err = 100					// Allow 100 error max.
 };
 ~~~
 
 
-### e\_vbus\_index
+## e\_vbus\_index
 
-**Description:** Define logical direction of vbus, i.e. the pair camera selected.
+**Description:** Define logical direction of vbus, i.e. the Guidance Sensor selected.
 
 
-~~~
+~~~ cpp
 enum e_vbus_index
 {
     e_vbus1 = 1,        // logic direction of vbus
@@ -280,43 +278,35 @@ enum e_vbus_index
 };
 ~~~
 
-### e\_image\_data\_frequecy
+## e\_image\_data\_frequecy
 
 **Description:** Define frequency of image data.
 
-~~~
+~~~ cpp
 enum e_image_data_frequecy
 {
     e_frequecy_5  = 0,  // frequecy of image data 
     e_frequecy_10 = 1,  // frequecy of image data 
     e_frequecy_20 = 2   // frequecy of image data 
 };
-
 ~~~
 
-### user\_callback
+## user\_callback
 
 **Description:** Call back function prototype.
+**Parameters:** `event_type` use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; `data_len` length of the input data; `data` input data read from GUIDANCE
+**Return:** `error code`. Non-zero if error occurs.
 
-**Parameters:** event\_type use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; data\_len length of the input data; data input data read from GUIDANCE
-
-**Return:** non-zero if error occurs
-
-
-~~~
-
+~~~ cpp
 typedef int (*user_call_back)( int event_type, int data_len, char *data );
-
 ~~~
 
 
-### e\_guidance\_event
+## e\_guidance\_event
 
 **Description:** Define event type of callback.
 
-
-~~~
-
+~~~ cpp
 enum e_guidance_event
 {
     e_image = 0,            // called back when image comes 
@@ -326,14 +316,13 @@ enum e_guidance_event
     e_obstacle_distance,    // called back when obstacle data comes 
     e_event_num
 };
-
 ~~~
 
-### image\_data
+## image\_data
 
 **Description:** Define image data structure. The center of depth image coincides with the corresponding left greyscale image's.
 
-~~~
+~~~ cpp
 typedef struct _image_data
 {
     unsigned int     frame_index;   // frame index 
@@ -344,11 +333,11 @@ typedef struct _image_data
 }image_data;
 ~~~
 
-### ultrasonic\_data
+## ultrasonic\_data
 
 **Description:** Define ultrasonic data structure. Unit is `mm`.
 
-~~~
+~~~ cpp
 typedef struct _ultrasonic_data
 {
     unsigned int     frame_index;    // corresponse frame index 
@@ -358,28 +347,27 @@ typedef struct _ultrasonic_data
 }ultrasonic_data;
 ~~~
 
-### velocity
+## velocity
 
 **Description:** Define velocity structure. Unit is `mm/s`.
 
-
-~~~
+~~~ cpp
 typedef struct _velocity
 {
     unsigned int     frame_index;        // corresponse frame index 
     unsigned int     time_stamp;         // time stamp of corresponse image captured in ms 
-    short            vx;                      // velocity of x in mm/s
-    short            vy;                      // velocity of y in mm/s 
-    short            vz;                      // velocity of z in mm/s 
+    short            vx;                 // velocity of x in mm/s
+    short            vy;                 // velocity of y in mm/s 
+    short            vz;                 // velocity of z in mm/s 
 }velocity;
 ~~~
 
 
-### obstacle\_distance
+## obstacle\_distance
 
 **Description:** Define obstacle distance structure. Unit is `cm`.
 
-~~~
+~~~ cpp
 typedef struct _obstacle_distance
 {
     unsigned int     frame_index;       // corresponse frame index 
@@ -388,12 +376,11 @@ typedef struct _obstacle_distance
 }obstacle_distance;
 ~~~
 
-### imu
+## imu
 
-**Description:** Define imu structure. Unit of acceleration is `m/s^2`. 
+**Description:** Define imu structure. Unit of acceleration is `m/s^2`.
 
-~~~
-
+~~~ cpp
 typedef struct _imu
 {
     unsigned int     frame_index;             // corresponse frame index 
@@ -401,21 +388,21 @@ typedef struct _imu
     float            acc_x;                   // acceleration of x m/s^2
     float            acc_y;                   // acceleration of y m/s^2
     float            acc_z;                   // acceleration of z m/s^2
-    float            q[4];                    // quaternion
+    float            q[4];                    // quaternion: [w,x,y,z]
 }imu;
 ~~~
 
-#
+
 # 5 API
 
-### Overview
+## Overview
 
 The GUIDANCE API provides configuration and control methods for GUIDANCE with C interface.
 
 
 Here is an overview of the key methods available in this API:
 
-~~~
+~~~ cpp
 // Guidance initialization
 SDK_API int reset_config( void );
 SDK_API int init_transfer( void );
@@ -442,180 +429,151 @@ SDK_API int get_online_status( int online_status[CAMERA_PAIR_NUM] );
 ~~~
 
 
-### Method
+## Method
 
-#### reset\_config
+### reset\_config
 
 **Description:** Clear the subscribed configure, if you want to subscribe the different data from last time.
-
 **Parameters:** NULL
+**Return:** `error code`. Non-zero if error occurs.
 
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int reset_config ( void );
 ~~~
 
 
-#### init\_transfer
+### init\_transfer
 
 **Description:** Initialize the GUIDANCE and connect it to PC.
-
 **Parameters:** NULL
+**Return:** `error code`. Non-zero if error occurs.
 
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int init_transfer ( void );
 ~~~
 
-#### select\_imu
+### select\_imu
 
 **Description:** Subscribe to imu.
-
 **Parameters:** NULL
-
 **Return:** NULL
 
-~~~
+~~~ cpp
 SDK_API void select_imu ( void );
 ~~~
 
-#### select\_ultrasonic
+### select\_ultrasonic
 
 **Description:** Subscribe to ultrasonic.
-
 **Parameters:** NULL
-
 **Return:** NULL
 
-~~~
+~~~ cpp
 SDK_API void select_ultrasonic ( void );
 ~~~
 
-#### select\_velocity
+### select\_velocity
 
 **Description:** Subscribe to velocity data, i.e. velocity of GUIDANCE in body coordinate system.
-
 **Parameters:** NULL
-
 **Return:** NULL
 
-~~~
+~~~ cpp
 SDK_API void select_velocity ( void );
 ~~~
 
 
-#### select\_obstacle\_distance
+### select\_obstacle\_distance
 
 **Description:** Subscribe to obstacle distance, i.e. distance from obstacle.
-
 **Parameters:** NULL
-
 **Return:** NULL
 
 
-~~~
+~~~ cpp
 SDK_API void select_obstacle_distance ( void );
 ~~~
 
 
-#### set\_image\_frequecy
+### set\_image\_frequecy
 
 **Description:** Set frequency of image transfer.
+(**Note:** The bandwidth of USB is limited. If you subscribe too much images (greyscale image or depth image), the frequency should be relatively small, otherwise the SDK cannot guarantee the continuity of image transfer.)
+**Parameters:** `frequency` the frequency of image transfer
+**Return:** `error code`. Non-zero if error occurs.
 
-(p.s. As the bandwidth of USB is limited, if you subscribe too much images (greyscale image or depth image), the frequency should be relatively small, otherwise the SDK cannot guarantee the continuity of image transfer.)
-
-**Parameters:** frequencyis the frequency of image transfer
-
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int set_image_frequecy ( e_image_data_frequecy frequecy );
 ~~~
 
-#### select\_depth\_image
+### select\_depth\_image
 
 **Description:** Subscribe to depth image data.
-
-**Parameters:** camera\_pair\_index index of camera pair selected
-
-**Return:** NULL
+**Parameters:** `camera_pair_index` index of camera pair selected.
+**Return:** `NULL`
 
 
-~~~
+~~~ cpp
 SDK_API void select_depth_image ( e_vbus_index camera_pair_index );
 ~~~
 
-#### select\_greyscale\_image
+### select\_greyscale\_image
 
 **Description:** Subscribe to rectified grey image data.
+**Parameters:** `camera_pair_index` index of camera pair selected; `is_left` whether the image data selected is left.
+**Return:** `error code`. Non-zero if error occurs.
 
-**Parameters:** camera\_pair\_index index of camera pair selected; is\_left whether the image data selected is left
-
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int select_greyscale_image ( e_vbus_index camera_pair_index, bool is_left );
 ~~~
 
-#### set\_sdk\_event\_handler
+### set\_sdk\_event\_handler
 
 **Description:** Set callback, when data from GUIDANCE comes, it will be called by transfer thread.
+**Parameters:** `handler` pointer to callback function.
+**Return:** `error code`. Non-zero if error occurs.
 
-**Parameters:** handler pointer to callback function.
-
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int set_sdk_event_handler ( user_call_back handler );
 ~~~
 
-#### start\_transfer
+### start\_transfer
 
 **Description:** Send message to GUIDANCE to start data transfer.
-
 **Parameters:** NULL .
+**Return:** `error code`. Non-zero if error occurs.
 
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int start_transfer ( void );
 ~~~
 
-#### stop\_transfer
+### stop\_transfer
 
 **Description:** Send message to GUIDANCE to stop data transfer.
-
 **Parameters:** NULL .
+**Return:** `error code`. Non-zero if error occurs.
 
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int stop_transfer ( void );
 ~~~
 
-#### release\_transfer
+### release\_transfer
 
 **Description:** Release the data transfer thread.
-
 **Parameters:** NULL .
+**Return:** `error code`. Non-zero if error occurs.
 
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int release_transfer ( void );
 ~~~
 
-#### get\_online\_status
+### get\_online\_status
 
 **Description:** Get the online status of GUIDANCE sensors.
+**Parameters:** `online\_status[CAMERA\_PAIR\_NUM]` online status of GUIDANCE sensors
+**Return:** `error code`. Non-zero if error occurs.
 
-**Parameters:** online\_status[CAMERA\_PAIR\_NUM] online status of GUIDANCE sensors
-
-**Return:** error code. Non-zero if error occurs
-
-~~~
+~~~ cpp
 SDK_API int get_online_status (int online_status[CAMERA_PAIR_NUM] );
 ~~~
 
