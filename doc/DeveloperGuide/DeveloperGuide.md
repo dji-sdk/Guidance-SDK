@@ -143,7 +143,7 @@ For example:
 
 - To save the trouble of using `sudo` every time you run Guidance SDK programs, you can also create a file `51-guidance.rules` in `/etc/udev/rules.d/` with the following content:
 
-		SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", ATTR{idProduct}=="d009", MODE="0666"
+		SUBSYSTEM=="usb", ATTR{idVendor}=="fff0", ATTR{idProduct}=="d009", MODE="0666"
 Then disconnect and connect again USB cable of Guidance Core. Now you will be able to run Guidance SDK programs without `sudo`.
 
 ## Common Errors
