@@ -146,9 +146,9 @@ For example:
 		SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", ATTR{idProduct}=="d009", MODE="0666"
 Then disconnect and connect again USB cable of Guidance Core. Now you will be able to run Guidance SDK programs without `sudo`.
 
-### Common Errors
+## Common Errors
 >**Set up your environment according to the steps in Developer Guide can avoid most of the errors.**
-#### Connection error
+### Connection error
 ***Description:*** 
 **“usb error”** or things like that happen, for example:
 
@@ -168,8 +168,8 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 
 ---
 
-#### Build error
-##### Error while loading shared libraries
+### Build error
+#### Error while loading shared libraries
 ***Description:***
 
 
@@ -183,7 +183,7 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 
 ---
 
-##### Cannot open DJI\_guidance.dll file
+#### Cannot open DJI\_guidance.dll file
 ***Description:***
 
 
@@ -195,7 +195,7 @@ Make sure that corresponding **DJI\_guidance.dll** is placed in the RUNPATH.
 
 ---
 
-##### OpenCV related error
+#### OpenCV related error
 ***Description:***
 
 	Cannot open OpenCV related *.h or *.dll.
@@ -206,7 +206,7 @@ Check the configuration of OpenCV, remember that we use **$(OPENCVROOT)** as an 
 
 ---
 
-#### Data transfer error
+### Data transfer error
 ***Description:***
 
 Data transfer error occurs means you may get a wrong image, for example:
@@ -220,8 +220,7 @@ Data transfer error occurs means you may get a wrong image, for example:
 
 ---
  
-## How to build a visual tracking project using Guidance SDK
->*Attention: please do not run the Guidance SDK programs on virtual machine.*
+## How to build a visual tracking project
 
 This tutorial gives an example of building a visual tracking project using Guidance SDK step by step. 
 
