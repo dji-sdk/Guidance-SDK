@@ -32,7 +32,7 @@ If you connect Guidance Core to PC by UART, then check if `USB_to_RS232` driver 
 Make sure the USB or UART driver has been installed successfully, you can check it with `DJI_Guidance` software by using USB connected to PC, or check in `Device Manager` if using UART. 
 Then set the `DIY` Mode in DJI_Guidance software, and choose `USB` or `UART` if needed. 
 
-If errors about OpenCV occur, most likely it is because environmental viriables `OPENCVROOT` is not properly added.
+If errors about OpenCV occur, most likely it is because environmental variables `OPENCVROOT` is not properly added.
 
 
 ## Can I get image data using UART?
@@ -70,4 +70,4 @@ Currently we only support baud rate **115200** when using UART.
 
 
 ## Can I get the camera intrinsic parameters using Guidance SDK?
-Currently we do not have this function. The next version of Guidance SDk will open the interface to get the camera intrinsic parameters.
+Currently we do not have this function. The next version of Guidance SDK will open the interface to get the camera intrinsic parameters.
