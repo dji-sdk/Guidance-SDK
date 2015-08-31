@@ -9,22 +9,27 @@ Document
 English version:
 
 
-　[Developer Guide](doc/DeveloperGuide/DeveloperGuide.md)
+　[Developer Guide](doc/Guides/Developer_Guide/en/DeveloperGuide_en.md)
 
-　[Guidance SDK API Documentation](doc/Guidance_SDK_API.md)
+　[Run Example](doc/Guides/RunExample/runExample.md)
+
+　[Build a Visual Tracking Project](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_en.md)
+
+　[API Documentation](doc/Guidance_SDK_API/Guidance_SDK_API.md)
 
 
 中文版本：
 
-　[开发者指南](doc/开发者指南/开发者指南.md)　
+　[开发者指南](doc/Guides/Developer_Guide/en/DeveloperGuide_cn.md)　
 
-　[Guidance SDK API Documentation](doc/Guidance_SDK_API.md)
+　[创建一个视觉跟踪工程](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_en.md)
+
 
 
 Structure
 =========
 -	**demo**: a visual tracking project by using Guidance SDK
--	**doc**: API details
+-	**doc**: documentations
 -	**examples**: examples for USB, UART and ROS
 -	**include**: Header file of Guidance SDK 
 -	**lib**: Library files for Windows
