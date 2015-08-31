@@ -20,9 +20,9 @@ English version:
 
 中文版本：
 
-　[开发者指南](doc/Guides/Developer_Guide/en/DeveloperGuide_cn.md)　
+　[开发者指南](doc/Guides/Developer_Guide/cn/DeveloperGuide_cn.md)　
 
-　[创建一个视觉跟踪工程](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_en.md)
+　[创建一个视觉跟踪工程](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_cn.md)
 
 
 
