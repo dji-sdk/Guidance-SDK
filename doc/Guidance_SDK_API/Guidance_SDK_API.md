@@ -57,7 +57,9 @@ There are two ways to subscribe the data through USB.
 
 #### 2. UART
 
-The supported data types are Velocity Data, Obstacle Distance Data, IMU Data, and Ultrasonic Data.
+The output data types of UART are Velocity Data, Obstacle Distance Data, IMU Data, and Ultrasonic Data. Image data are not output via UART due to the bandwidth limit.
+
+**Note:** Guidance UART only supports 115200 baud rate.
 
 1. Subscribe Data
 
