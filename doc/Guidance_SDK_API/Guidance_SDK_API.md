@@ -88,6 +88,7 @@ Protocol Frame Explanation:
 | CRC32 | --② | 32 | Frame CRC32checksum |
 
 ① Frame data size can vary, 1007 is the maximum length.
+
 ② The index of this field depends on the length of the data field.
 
 Data Field Format:
