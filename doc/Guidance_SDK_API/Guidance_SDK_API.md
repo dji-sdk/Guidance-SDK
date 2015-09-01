@@ -59,7 +59,7 @@ There are two ways to subscribe the data through USB.
 
 The output data types of UART are Velocity Data, Obstacle Distance Data, IMU Data, and Ultrasonic Data. Image data are not output via UART due to the bandwidth limit.
 
-**Note:** Guidance UART only supports 115200 baud rate.
+**Note:** Guidance UART only supports **115200** baud rate.
 
 1. Subscribe Data
 
@@ -87,8 +87,8 @@ Protocol Frame Explanation:
 | DATA | 12 | --① | Frame data, maximum length  1007bytes |
 | CRC32 | --② | 32 | Frame CRC32checksum |
 
-1. Frame data size can vary, 1007 is the maximum length.
-2. The index of this field depends on the length of the data field.
+① Frame data size can vary, 1007 is the maximum length.
+② The index of this field depends on the length of the data field.
 
 Data Field Format:
 
@@ -107,7 +107,7 @@ Data Field Explanation:
 
 Each of the supported data types is described below.
 
-- **Velocity Data:** Outputs velocity information. The unit is **millimeter/second** and the frequency is 20 Hz.
+- **Velocity Data:** Outputs velocity information. The unit is **millimeter/second** and the frequency is 10 Hz.
 
 - **Obstacle Distance Data:** Outputs obstacle distance for five directions. The unit is **centimeter** and the frequency is 20 Hz.
 
@@ -115,11 +115,11 @@ Each of the supported data types is described below.
 
 - **Ultrasonic Data:** Outputs ultrasonic data for five directions, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
 
-- **Greyscale Image:** Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using Guidance API.
+- **Greyscale Image:** Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
 
-- **Depth Image:** Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using Guidance API.
+- **Depth Image:** Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.
   
-  **Notes:** In order to achieve best performance, it is suggested that large data (e.g. images) be copied instead of processing the data in-place, if the received data will be processed for a long time.
+  **Notes:** In order to achieve best performance, it is suggested not performing any time-consuming processing in the callback function, but only copying the data out. Otherwise the transfer frequency might be slowed down. 
 
 
 ## Data Structures
