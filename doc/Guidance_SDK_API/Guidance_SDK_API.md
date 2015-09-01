@@ -84,8 +84,8 @@ Protocol Frame Explanation:
 | RES | 5 | 40 | Reserved bits, fixed to be 0 |
 | SEQ | 8 | 16 | Frame sequence number |
 | CRC16 | 10 | 16 | Frame header CRC16 checksum |
-| DATA | 12 | --① | Frame data, maximum length  1007bytes |
-| CRC32 | --② | 32 | Frame CRC32checksum |
+| DATA | 12 | --① | Frame data, maximum length  1007 bytes |
+| CRC32 | --② | 32 | Frame CRC32 checksum |
 
 ① Frame data size can vary, 1007 is the maximum length.
 
@@ -101,20 +101,20 @@ Data Field Explanation:
 | Data Field | Byte Index | Size（byte） | Description |
 | --- | --- | --- | --- |
 | COMMAND SET | 0 | 1 | Always 0x00 |
-| COMMAND ID | 1 | 1 | e\_image: 0x00e\_imu: 0x01e\_ultrasonic: 0x02e\_velocity: 0x03e\_obstacle\_distance: 0x04 |
+| COMMAND ID | 1 | 1 | e\_image: 0x00; e\_imu: 0x01; e\_ultrasonic: 0x02; e\_velocity: 0x03; e\_obstacle\_distance: 0x04 |
 | COMMAND DATA | 2 | -- | Data body |
 
 ### Data Types
 
 Each of the supported data types is described below.
 
-- **Velocity Data:** Outputs velocity information. The unit is **millimeter/second** and the frequency is 10 Hz.
+- **Velocity Data:** velocity in body frame. The unit is **millimeter/second** and the frequency is 10 Hz.
 
-- **Obstacle Distance Data:** Outputs obstacle distance for five directions. The unit is **centimeter** and the frequency is 20 Hz.
+- **Obstacle Distance Data:** obstacle distance from five Guidance Sensors. The unit is **centimeter** and the frequency is 20 Hz.
 
-- **IMU Data:** Outputs IMU data, including accelerometer (in unit of meter/second) and attitude (in quaternion format) data. The frequency is 20 Hz.
+- **IMU Data:** IMU data including accelerometer (in unit of m/s^2) and gyroscope (in quaternion format) data. The frequency is 20 Hz.
 
-- **Ultrasonic Data:** Outputs ultrasonic data for five directions, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
+- **Ultrasonic Data:** Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
 
 - **Greyscale Image:** Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
 
@@ -140,7 +140,7 @@ enum e_sdk_err_code
     e_image_frequency_not_allowed,		// Image frequency must be one of the enum type e_image_data_frequecy 
     e_config_not_ready,					// Get config including the work type flag, before you can select data 
     e_online_flag_not_ready,			// Online flag is not ready 
-    e_max_sdk_err = 100					// Allow 100 error max.
+    e_max_sdk_err = 100					// maximum number of errors
 };
 ~~~
 
