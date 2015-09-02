@@ -2,9 +2,11 @@
 
 这里我们要实现的功能是利用Guidance SDK中的API，通过USB从Guidance中读取图像数据，使用camshift完成一个视觉跟踪的应用。该教程支持Windows和Ubuntu系统。
 
+**demo**文件夹中已经有了一个完整的视觉跟踪的工程，用户可以直接编译运行这个工程，以便有一个整体的认识。然后依照下面的指示，从零开始建立一个视觉跟踪的工程。
+
 ## 下载并解压SDK
 
-你可以从GitHub下载到最新的[SDK](https://github.com/dji-sdk/GuidanceSDK).
+你可以从GitHub下载到最新的[Guidance SDK](https://github.com/dji-sdk/GuidanceSDK)并解压。
 
 内容包括：
 
@@ -15,9 +17,6 @@
 - **lib**: Windows下库文件
 - **so**: Linux下库文件
 
-解压SDK到相应目录。
-
-![SDK概览](./Images/cn/8.png)
 
 ## Windows
 
@@ -25,10 +24,7 @@
 
 如下图所示，在SDK/demo目录下创建自己的工程，这里在VS2010中创建了一个**“Win32控制台程序”**类型的空工程，工程名为**“guidanceSDK\_test”**。
 
-![新建工程](./Images/cn/9.png)
-
- 
-![在demo中新建工程](./Images/cn/11.png)
+![新建工程](./Images/en/new_proj.jpg)
 
 
 ### 2. 添加相应的.h及.cpp到工程
@@ -39,92 +35,66 @@
 
 #### 2.2 添加DJI\_utility与DJI\_utility.cpp
 
-首先将要使用到的线程操作保护的源文件DJI\_utility.cpp与头文件DJI\_utility.h复制到与main.cpp同目录下，并在项目中添加。（DJI\_utility.cpp与DJI\_utility.h在demo及examples中均可找到）
+首先将要使用到的线程操作保护的源文件DJI\_utility.cpp与头文件DJI\_utility.h复制到与main.cpp同目录下，并在项目中添加。DJI\_utility.cpp与DJI\_utility.h在demo及examples中均可找到。
  
-![Alt text](./Images/cn/12.png)
+- 在demo/sdk\_tracking\_camshift/camshift中的DJI\_utility相关文件。
+- 将DJI\_utility文件复制到工程所在文件夹，并添加到guidanceSDK\_test工程中:
 
-图5 在demo/sdk\_tracking\_camshift/camshift中的DJI\_utility文件
+	![Alt text](./Images/en/utility.jpg) 
 
-![Alt text](./Images/cn/13.png)
+	![Alt text](./Images/en/utility_add.jpg)
 
-图6 将DJI\_utility文件复制到guidanceSDK\_test工程中
- 
-![Alt text](./Images/cn/14.png)
-
-图7 在guidanceSDK\_test工程中添加DJI\_utility文件
 
 #### 2.3 配置头文件与链接库路径
 
 需要配置的有**DJI\_guidance.h**、**DJI\_guidance.lib**与**OpenCV**头文件及库文件的路径。
 DJI\_guidance.h头文件位于SDK/include中；DJI\_guidance.lib位于SDK/lib中，在VS2010中需要进行相应的配置将它们的路径包含到工程中。由于本教程运行于Release Win32模式下，最后编译输出x86平台的release文件，对应的**DJI\_guidance.lib**文件具体路径为**SDK/lib/2010/x86**。
  
-![DJI\_guidance.h位于SDK/include](./Images/cn/15.png)
+- Visual Studio 2010工程为Release Win32模式：
+	![工程为Release Win32模式](./Images/en/config.jpg) 
+- 在SDK/include中找到DJI\_guidance.h并复制到工程目录。
+- 在SDK/lib/2010/x86中找到DJI\_guidance.lib并复制到工程目录。
+- 将OpenCV相关的头文件和库文件目录添加到工程。
 
+
+为简化配置的繁琐，可直接复制SDK/demo/sdk\_tracking\_camshift目录下的
+**“use\_opencv\_release\_vs2010\_x86.props”**
+**“use\_Guidance\_vs2010\_x86.props”** 
+文件到解决方案目录下并添加到工程。
  
-![工程为Release Win32模式](./Images/cn/16.png)
+- 在sdk\_tracking\_camshift工程目录中找到 **“use\_opencv\_release\_vs2010\_x86.props”** 和
+**“use\_Guidance\_vs2010\_x86.props”**配置文件：
+	
+	![Alt text](./Images/en/props.jpg) 
+- 将相应的props配置文件拷贝到 解决方案目录下：
+	
+	![Alt text](./Images/en/props_add.jpg) 
+- 切换工具栏到 **”配置管理器”**，右键单击Release | Win32，点击添加已有配置表 “Add Existing Property Sheet”，将工程目录下的 **“use\_opencv\_release\_vs2010\_x86.prop”** 与 **“use\_Guidance\_vs2010\_x86.prop”** 这两个配置文件添加到工程中：
 
-![Alt text](./Images/cn/17.png)
+	![Alt text](./Images/en/props_add_proj.jpg) 
 
-图10 本教程使用的DJI\_guidance.lib位于SDK/lib/2010/x86
 
-简化配置的繁琐，直接复制SDK/demo/sdk\_tracking\_camshift目录下的
-**“use\_opencv\_release\_vs2010\_x86.prop”**
-**“use\_Guidance\_vs2010\_x86.prop”** 
-文件，拷贝到 ”guidanceSDK\_test.sln” 目录下；
+>*请注意：这里默认用户已按照环境配置中所述的方法，安装了Opencv2411，并正确添加了环境变量OPENCVROOT。这一环境变量在OpenCV的配置文件中被用到。*
+
+当工程路径变化时，用户也可以通过修改配置文件来适应；具体的可以查看相应的配置文件；这里给出一个Guidance相关文件配置的例子，OpenCV的配置类似。
  
-![Alt text](./Images/cn/18.png)
+- “use\_Guidance\_vs2010\_x86.prop”中配置的头文件路径:
 
-图11 复制sdk\_tracking\_camshift工程的prop配置文件
+	![Alt text](./Images/en/guidance_props.jpg) 
+
+- “use\_Guidance\_vs2010\_x86.prop”中配置的链接库路径:
  
-![Alt text](./Images/cn/19.png)
-
-图12 将相应的prop配置文件拷贝到 guidanceSDK\_test 工程目录下
-
-如下图所示，切换工具栏到 **”配置管理器”**，右键单击Release | Win32，点击添加已有配置表 “Add Existing Property Sheet”，将工程目录下的 **“use\_opencv\_release\_vs2010\_x86.prop”** 与 **“use\_Guidance\_vs2010\_x86.prop”** 这两个配置文件添加到工程中。
- 
-![Alt text](./Images/cn/20.png)
-
-图13 添加prop配置文件到工程
- 
-![Alt text](./Images/cn/21.png)
-
-图14 配置完成
-
->*请注意：这里默认用户已按照环境配置中所述的方法，安装了Opencv2411，并添加了环境变量OPENCVROOT及OpenCV对应的PATH路径。*
-
-当工程路径变化时，用户也可以通过修改配置文件来适应；具体的可以查看相应的配置文件；这里给出一个Guidance相关文件配置的例子，OpenCV同理。
- 
-![Alt text](./Images/cn/22.png)
-
-图15 “use\_Guidance\_vs2010\_x86.prop”中配置的头文件路径
- 
-![Alt text](./Images/cn/23.png)
-
-图16 “use\_Guidance\_vs2010\_x86.prop”中配置的链接库路径
+	![Alt text](./Images/en/guidance_props2.jpg) 
 
 ### 3. 配置动态链接库文件
 
 在SDK根目录下有lib文件夹，由于本教程中默认是VS2010建立的工程，并且运行Release Win32的程序，因此进入**lib/2010/x86**，将相应的**DJI\_guidance.dll**文件复制出来。
  
-![Alt text](./Images/cn/24.png)
-
-图17 程序运行在Release | Win32模式下
- 
-![Alt text](./Images/cn/25.png)
-
-图18 工程所需的dll文件与lib文件目录
-
-将DJI\_guidance.dll复制到bin文件目录下，这里bin文件目录在同*.sln目录下；
- 
-![Alt text](./Images/cn/26.png)
-
-图19 复制对应的dll文件到 guidanceSDK\_test的bin目录下
-
-至此，动态链接库配置完成。
+![Alt text](./Images/en/dll.jpg) 
 
 ### 4. 填入main.cpp代码
 
-- 首先添加程序所需头文件，DJI\_guidance.h中包含了Guidance API函数声明的头文件，必须添加；DJI\_utility.h中包含了线程操作保护的头文件；opencv对应的头文件用于图像显示及视觉算法应用；
+- 首先添加程序所需头文件。**DJI\_guidance.h**中包含了Guidance API函数声明的头文件，必须添加；**DJI\_utility.h**中包含了线程操作保护的头文件；**OpenCV**对应的头文件用于图像显示及视觉算法应用；
 
 ~~~cpp
 #include "opencv2/video/tracking.hpp"
@@ -215,16 +185,10 @@ static void help()
 ~~~
 
 本教程给出的是基于camshift算法与深度图的视觉跟踪demo，当程序开始运行用户需要首先使用鼠标在**“Guidance Tracking Demo”窗口**中框出需要跟踪的目标，接着移动目标可以观察到跟踪效果；
- 
-![Alt text](./Images/cn/27.png)
 
-图20 用户需用鼠标在灰度图窗口上框出被跟踪目标
- 
-![Alt text](./Images/cn/28.png)
+ ![Alt text](./Images/en/run_win.jpg) 
 
-图21 bin目录下生成result.avi记录视频
-
-- 然后定义一个回调函数，当订阅的数据到来时程序会自动调用该函数。**用户应该只在回调函数中进行轻量级的处理，比如复制和显示等，否则会降低数据传输频率。**
+- 然后定义一个回调函数，当订阅的数据到来时程序会自动调用该函数。**用户应该只在回调函数中进行轻量级的处理，比如数据拷贝等，否则会降低数据传输频率。**
 
 ~~~cpp
 Mat g_imleft(HEIGHT, WIDTH, CV_8U);
@@ -424,36 +388,25 @@ int main( int argc, const char* argv[] )
 
 ### 1. 新建工程文件夹
 
-在SDK根目录下新建用户工程目录，这里建立了两层目录**“demo\guidanceSDK\_test\camshiftDemo”** ，并在 camshiftDemo 文件夹中添加了DJI\_utility.cpp 与 DJI\_utility.h，具体请见上一部分；另外main.cpp中的代码也与上一节Windows的介绍中相同，在此不赘述，直接拷贝过来。
- 
-![Alt text](./Images/cn/29.png)
+- 将SDK包下载到`~/Desktop/GuidanceSDK`目录。
+- 新建工程目录 `~/Desktop/SDK/demo/guidance_track`，并添加DJI\_utility.cpp 与 DJI\_utility.h；另外main.cpp中的代码也与上一节Windows的介绍中相同，在此不赘述，直接拷贝过来。
+	
+		mkdir ~/Desktop/GuidanceSDK/demo/guidance_track
+		cd ~/Desktop/SDK/demo/guidance_track
 
-图22 拷贝DJI\_utility文件及main.cpp
+  ![Alt text](./Images/en/linux_folder.jpg) 
 
 ### 2. 添加libDJI\_guidance.so文件
 
 由于本教程使用的是**32位的Ubuntu14.04系统**，因此去SDK根目录下的**so/x86**中，将**libDJI\_guidance.so**文件复制到**usr\local\lib** 文件夹下即可，不同位数系统请复制对应的.so文件。请注意，复制时需要用到`sudo`权限。
- 
-![Alt text](./Images/cn/30.png)
 
-图23 guidance动态链接库目录
- 
-![Alt text](./Images/cn/31.png)
-
-图24 拷贝libDJI\_guidance.so到usr\local\lib下
+	sudo cp ~/Desktop/GuidanceSDK/so/x86/libDJI_guidance.so /usr/local/lib
 
 ### 3. 编写Makefile文件
 
-接着编写Makefile文件对工程进行编译，查看guidance SDK的头文件及动态链接库文件目录；
+接着编写Makefile文件。确保OpenCV已经正确安装。
 
-![Alt text](./Images/cn/32.png)
-
-图25 guidance头文件目录
-在camshiftDemo文件夹下新建Makefile文件并编写相应的Makefile代码。这里默认用户已经按照环境配置配置好OpenCV。
- 
-![Alt text](./Images/cn/33.png)
-
-图26 添加Makefile文件
+	gedit Makefile
 
 Makefile代码如下：
 
@@ -481,8 +434,16 @@ clean:
 
 ### 4. 编译与运行
 
-`cd`到 “**camshiftDemo”** 文件夹目录下，运行命令 `make` ，接着等待编译完成后，连接并启动Guidance，运行命令 `sudo ./main` ；运行正确应显示如下图所示状态。当程序启动后，在“Guidance Tracking Demo”窗口中用鼠标框出待跟踪目标，接着可以在图上看到目标跟踪效果，在该窗口上按 **’q’** 键退出程序。
+- 启动Guidance，并通过USB线将其与电脑连接。
+- 编译并运行工程
 
-![程序运行时](./Images/cn/34.png)
+		make
+		sudo ./main
+- 当程序启动后，在“Guidance Tracking Demo”窗口中用鼠标框出待跟踪目标，接着可以在图上看到目标跟踪效果：
+
+	![Alt text](./Images/en/linux_run.jpg) 
+
+- 在该窗口上按 `q` 键退出程序。
+
 
 

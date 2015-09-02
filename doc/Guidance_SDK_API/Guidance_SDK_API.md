@@ -57,7 +57,9 @@ There are two ways to subscribe the data through USB.
 
 #### 2. UART
 
-The supported data types are Velocity Data, Obstacle Distance Data, IMU Data, and Ultrasonic Data.
+The output data types of UART are Velocity Data, Obstacle Distance Data, IMU Data, and Ultrasonic Data. Image data are not output via UART due to the bandwidth limit.
+
+**Note:** Guidance UART only supports **115200** baud rate.
 
 1. Subscribe Data
 
@@ -82,11 +84,12 @@ Protocol Frame Explanation:
 | RES | 5 | 40 | Reserved bits, fixed to be 0 |
 | SEQ | 8 | 16 | Frame sequence number |
 | CRC16 | 10 | 16 | Frame header CRC16 checksum |
-| DATA | 12 | --① | Frame data, maximum length  1007bytes |
-| CRC32 | --② | 32 | Frame CRC32checksum |
+| DATA | 12 | --① | Frame data, maximum length  1007 bytes |
+| CRC32 | --② | 32 | Frame CRC32 checksum |
 
-1. Frame data size can vary, 1007 is the maximum length.
-2. The index of this field depends on the length of the data field.
+① Frame data size can vary, 1007 is the maximum length.
+
+② The index of this field depends on the length of the data field.
 
 Data Field Format:
 
@@ -98,26 +101,26 @@ Data Field Explanation:
 | Data Field | Byte Index | Size（byte） | Description |
 | --- | --- | --- | --- |
 | COMMAND SET | 0 | 1 | Always 0x00 |
-| COMMAND ID | 1 | 1 | e\_image: 0x00e\_imu: 0x01e\_ultrasonic: 0x02e\_velocity: 0x03e\_obstacle\_distance: 0x04 |
+| COMMAND ID | 1 | 1 | e\_image: 0x00; e\_imu: 0x01; e\_ultrasonic: 0x02; e\_velocity: 0x03; e\_obstacle\_distance: 0x04 |
 | COMMAND DATA | 2 | -- | Data body |
 
 ### Data Types
 
 Each of the supported data types is described below.
 
-- **Velocity Data:** Outputs velocity information. The unit is **millimeter/second** and the frequency is 20 Hz.
+- **Velocity Data:** velocity in body frame. The unit is **millimeter/second** and the frequency is 10 Hz.
 
-- **Obstacle Distance Data:** Outputs obstacle distance for five directions. The unit is **centimeter** and the frequency is 20 Hz.
+- **Obstacle Distance Data:** obstacle distance from five Guidance Sensors. The unit is **centimeter** and the frequency is 20 Hz.
 
-- **IMU Data:** Outputs IMU data, including accelerometer (in unit of meter/second) and attitude (in quaternion format) data. The frequency is 20 Hz.
+- **IMU Data:** IMU data including accelerometer (in unit of m/s^2) and gyroscope (in quaternion format) data. The frequency is 20 Hz.
 
-- **Ultrasonic Data:** Outputs ultrasonic data for five directions, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
+- **Ultrasonic Data:** Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
 
-- **Greyscale Image:** Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using Guidance API.
+- **Greyscale Image:** Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
 
-- **Depth Image:** Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using Guidance API.
+- **Depth Image:** Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.
   
-  **Notes:** In order to achieve best performance, it is suggested that large data (e.g. images) be copied instead of processing the data in-place, if the received data will be processed for a long time.
+  **Notes:** In order to achieve best performance, it is suggested not performing any time-consuming processing in the callback function, but only copying the data out. Otherwise the transfer frequency might be slowed down. 
 
 
 ## Data Structures
@@ -137,7 +140,7 @@ enum e_sdk_err_code
     e_image_frequency_not_allowed,		// Image frequency must be one of the enum type e_image_data_frequecy 
     e_config_not_ready,					// Get config including the work type flag, before you can select data 
     e_online_flag_not_ready,			// Online flag is not ready 
-    e_max_sdk_err = 100					// Allow 100 error max.
+    e_max_sdk_err = 100					// maximum number of errors
 };
 ~~~
 

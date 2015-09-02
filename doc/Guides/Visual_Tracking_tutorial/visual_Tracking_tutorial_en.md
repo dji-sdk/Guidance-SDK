@@ -2,26 +2,22 @@
 
 This tutorial gives an example of building a visual tracking project using Guidance SDK step by step. It supports Windows and Linux.
 
+A complete visual tracking project is already included in the **demo** folder. The user is encouraged to build and run the project first to get a feeling of how it would work. Then follow the instructions below to get the knowledge of how to build a Guidance SDK project from scratch. 
+
 ---
 
 ## Download and unzip SDK
 
-Latest version of SDK is available on GitHub: https://github.com/dji-sdk
+Latest version of SDK is available on GitHub and then decompress it: [Guidance SDK](https://github.com/dji-sdk/GuidanceSDK).
 
 The content includes：
 
 -	**demo**: a visual tracking project by using Guidance SDK
 -	**doc**: API details
 -	**examples**: examples for USB, UART and ROS
--	**include**: Header file of Guidance SDK 
--	**lib**: Library files for Windows
--	**so**: Library files for Linux
-
-Unzip the SDK.
- 
- ![Alt text](./Images/en/9.png) 
-
- Figure.1 SDK overview 
+-	**include**: header file of Guidance SDK 
+-	**lib**: library files for Windows
+-	**so**: library files for Linux
 
 ---
 
@@ -29,16 +25,10 @@ Unzip the SDK.
 
 ### 1. Create a project named “guidanceSDK\_test”
 
-Create an empty project in VS2010 in directory **“SDK/demo”** named **“guidanceSDK\_test”**.
+Create an empty project in VS2010 in directory **“demo”** named **“guidance\_track”**.
  
- ![Alt text](./Images/en/10.png) 
+ ![Alt text](./Images/en/new_proj.jpg) 
 
- Figure.2 Create an empty project named “guidanceSDK\_test” 
- 
-
-  ![Alt text](./Images/en/12.png) 
-
- Figure.4 Create the project in “SDK\demo”  
 
 ---
 
@@ -52,103 +42,77 @@ Add an empty **main.cpp** to project first.
 
 #### 2.2 Add DJI\_utility.h and DJI\_utility.cpp
 
-Copy the thread security related files **DJI\_utility.cpp** and **DJI\_utility.h** to the same directory as **main.cpp**, and add them in vs2010. (DJI\_utility.cpp and DJI\_utility.h can be found both in **SDK/demo** and **SDK/examples**)
+Copy the thread security related files **DJI\_utility.cpp** and **DJI\_utility.h** to the same directory as **main.cpp**, and add them in vs2010. DJI\_utility.cpp and DJI\_utility.h can be found both in **SDK/demo** and **SDK/examples**.
  
-  ![Alt text](./Images/en/13.png) 
+- Find **DJI\_utility.h** and **DJI\_utility.cpp** in **demo/sdk\_tracking\_camshift/camshift**.
+- Copy DJI\_utility files to project path, and add DJI\_utility files to the project:
 
- Figure.5 DJI\_utility files in demo/sdk\_tracking\_camshift/camshift 
+	![Alt text](./Images/en/utility.jpg) 
 
- ![Alt text](./Images/en/14.png) 
-
- Figure.6 Copy DJI\_utility files to project path 
-
-  ![Alt text](./Images/en/15.png) 
-
- Figure.7 Add DJI\_utility files to project in vs2010 
+	![Alt text](./Images/en/utility_add.jpg) 
 
 ---
 
 #### 2.3 Configure the Include and Library path
 
-There are **DJI\_guidance.h**, **DJI\_guidance.lib** and **OpenCV** related path needed to configure；
-**DJI\_guidance.h** is in **SDK/include**, **DJI\_guidance.lib** is in **SDK/lib**, the path of them should be added in vs2010. **DJI\_guidance.lib** in **SDK/lib/2010/x86** is going to be used here as we will run programs in **Release | Win32** mode.
+Now we need to configure **DJI\_guidance.h**, **DJI\_guidance.lib** and **OpenCV** related path.
+**DJI\_guidance.h** is in **include**, **DJI\_guidance.lib** is in **lib**. **DJI\_guidance.lib** in **lib/2010/x86** is going to be used here as we will run programs in **Release | Win32** mode.
  
- ![Alt text](./Images/en/16.png) 
+- Find the configuration of Visual Studio 2010, which is **Release | Win32**:
+	
+	![Alt text](./Images/en/config.jpg) 
+- Find **DJI\_guidance.h** is in **include** and copy to project directory.
+- Find **DJI\_guidance.lib** in **lib/2010/x86** and copy to project directory.
+- Add OpenCV related header and library path to the project.
+	
 
- Figure.8 DJI\_guidance.h is in SDK/include 
+To simplify the configuration, we can copy the property sheets
+**“use\_opencv\_release\_vs2010\_x86.props”** 
+**“use\_Guidance\_vs2010\_x86.props”** 
+in **demo/sdk\_tracking\_camshift** to the solution directory and add to the new project. 
 
-  ![Alt text](./Images/en/17.png) 
+- Find **“use\_opencv\_release\_vs2010\_x86.props”** and 
+**“use\_Guidance\_vs2010\_x86.props”**  in sdk\_tracking\_camshift:
 
- Figure.9 Release | Win32 mode 
+	![Alt text](./Images/en/props.jpg) 
+- Copy the property sheet files to the solution directory
 
-  ![Alt text](./Images/en/18.png) 
+	![Alt text](./Images/en/props_add.jpg) 
+- Switch the toolbar to **“Property Manager”** as shown below. Right-click the **Release | Win32**, and click the **“Add Existing Property Sheet”**， then add:
+**“use\_opencv\_release\_vs2010\_x86.props”**
+**“use\_Guidance\_vs2010\_x86.props”** 
+to the new project.	
 
- Figure.10 DJI\_guidance.lib in SDK/lib/2010/x86 is used here 
+	![Alt text](./Images/en/props_add_proj.jpg) 
 
-To simplify the configuration, we can simply copy the property sheets
-**“use\_opencv\_release\_vs2010\_x86.prop”** 
-**“use\_Guidance\_vs2010\_x86.prop”** 
-in **SDK/demo/sdk\_tracking\_camshift** to our project. 
 
- ![Alt text](./Images/en/19.png) 
-
- Figure.11 Copy corresponding *.prop in sdk\_tracking\_camshift 
-
-  ![Alt text](./Images/en/20.png) 
-
- Figure.12 Copy corresponding *.prop to the same directory as guidanceSDK\_test.sln  
-
-Switch the toolbar to **“Property Manager”** as shown below. Right-click the **Release | Win32**, and click the **“Add Existing Property Sheet”**， then add:
-**“use\_opencv\_release\_vs2010\_x86.prop”**
-**“use\_Guidance\_vs2010\_x86.prop”** 
-to our project.
- 
- ![Alt text](./Images/en/21.png) 
-
- Figure.13 Add *.prop to our project 
- 
-  ![Alt text](./Images/en/22.png) 
-
- Figure.14 Configuration is down 
-
->*Attention: Make sure you have set up the experiment environment properly, and installed OpenCV.*
+>*Attention: Make sure you have installed OpenCV, and set up the environment  variable OPENCVROOT properly, which is used by the OpenCV property sheet.*
 
 Users can modify the property sheet to adapt to changes of the path of project. Here gives a look at the path of Include and Library of Guidance SDK. 
  
-  ![Alt text](./Images/en/23.png) 
+- Include path of Guidance SDK in“use\_Guidance\_vs2010\_x86.props” 
+	
+	![Alt text](./Images/en/guidance_props.jpg) 
 
- Figure.15 Include path of Guidance SDK in“use\_Guidance\_vs2010\_x86.prop” 
+- Library path of Guidance SDK in “use\_Guidance\_vs2010\_x86.props” 
 
-  ![Alt text](./Images/en/24.png) 
-
- Figure.16  Library path of Guidance SDK in “use\_Guidance\_vs2010\_x86.prop” 
+	![Alt text](./Images/en/guidance_props2.jpg)  
 
 ---
 
 ### 3. Configure dynamic library
 
-Copy the DJI\_guidance.dll in **SDK/lib/2010/x86** to bin of our project.
- 
-  ![Alt text](./Images/en/25.png) 
+Copy the DJI\_guidance.dll from **SDK/lib/2010/x86** to the **bin** folder of our project.
 
- Figure.17 Release | Win32 mode 
+![Alt text](./Images/en/dll.jpg) 
 
-  ![Alt text](./Images/en/26.png) 
-
- Figure.18 Path of *.dll and *.lib 
-
-Copy **DJI\_guidance.dll** to bin, which is in the same directory as **guidanceSDK\_test.sln**.
-
-  ![Alt text](./Images/en/27.png) 
-
- Figure.19 Copy corresponding DJI\_guidance.dll to bin 
 
 
 ---
 
 ### 4. Edit main.cpp
 
-- 	Add the necessary headers to **main.cpp** first. **DJI\_guidance.h** is for Guidance SDK, **DJI\_utility.h** is for thread security, and **opencv** related headers are for image processing. 
+- 	Add the necessary headers to **main.cpp** first. **DJI\_guidance.h** is for Guidance SDK, **DJI\_utility.h** is for thread security, and **OpenCV** related headers are for image processing. 
 
 ~~~cpp
 #include "opencv2/video/tracking.hpp"
@@ -240,15 +204,9 @@ static void help()
 
 Since this tutorial gives a demo of camshift based tracking using depth image, users need to select object to track when the program starts with the window of **“Guidance Tracking Demo”**, and then the result will be shown. 
  
- ![Alt text](./Images/en/28.png) 
+ ![Alt text](./Images/en/run_win.jpg) 
 
- Figure.20 User select the object to tracking within the window of “Guidance Tracking Demo” 
-
-  ![Alt text](./Images/en/29.png) 
-
- Figure.21 result.avi records the process of this program 
-
--	Now we define a callback function, which will be called when the subscribed data comes. **Users should only write light-weight processing functions in the callback function, such as data copy and display, otherwise the data transfer frequency will be slowed down.**
+-	Now we define a callback function, which will be called when the subscribed data comes. **Users should only write light-weight processing functions in the callback function, such as data copy, otherwise the data transfer frequency will be slowed down.**
 
 ~~~cpp
 Mat g_imleft(HEIGHT, WIDTH, CV_8U);
@@ -454,43 +412,32 @@ One can click the **“Build”** and then **“Start Debugging”** after conne
 
 ## Linux
 
-### 1. Create a directory
+### 1. Download SDK package and create a project directory
 
-Create a directory **“SDK\demo\guidanceSDK\_test\camshiftDemo”**, Copy **DJI\_utility.cpp**, **DJI\_utility.h** and **main.cpp** to here，which is similar as in Windows.
+- Download the SDK package to `~/Desktop/GuidanceSDK`. 
+- Create a directory `~/Desktop/SDK/demo/guidance_track`, and copy **DJI\_utility.cpp**, **DJI\_utility.h** and **main.cpp** created under Windows to this directory.
+	
+		mkdir ~/Desktop/GuidanceSDK/demo/guidance_track
+		cd ~/Desktop/SDK/demo/guidance_track
  
-  ![Alt text](./Images/en/30.png) 
+  ![Alt text](./Images/en/linux_folder.jpg) 
 
- Figure.22 Copy DJI\_utility.cpp\DJI\_utility.h\main.cpp 
 
 ---
 
-### 2. Place libDJI\_guidance.so
+### 2. Copy libDJI\_guidance.so
 
-Suppose the operating system is **Ubuntu14.04 32bit**. We copy the **libDJI\_guidance.so** in **SDK/so/x86** to **usr/local/lib**, notice that `sudo` is necessary to copy these files to usr/local/lib. 
- 
-  ![Alt text](./Images/en/31.png) 
+Suppose the operating system is **Ubuntu14.04 32bit**. Copy the **libDJI\_guidance.so** from **so/x86** to **usr/local/lib**. Notice that `sudo` is necessary to copy these files to `/usr/local/lib`:
 
- Figure.23 path of guidance dynamic library 
-
-  ![Alt text](./Images/en/32.png) 
-
- Figure.24 Copy libDJI\_guidance.so to usr\local\lib 
+	sudo cp ~/Desktop/GuidanceSDK/so/x86/libDJI_guidance.so /usr/local/lib
 
 ---
 
 ### 3. Edit Makefile
 
-Edit a Makefile, check the include and library path of guidance SDK first；
+Create a Makefile in the project directory. Make sure OpenCV has been installed.
 
- ![Alt text](./Images/en/33.png) 
-
- Figure.25 include path of guidance 
-
-Create and edit the Makefile in directory **“camshiftDemo”**. Make sure OpenCV has been installed.
-
- ![Alt text](./Images/en/34.png) 
-
- Figure.26 Add a Makefile 
+	gedit Makefile
 
 Code of Makefile: 
 
@@ -517,7 +464,14 @@ clean:
 
 ### 4. Make and run
 
-`cd` to **“camshiftDemo”** directory, and type command `make`, then power up Guidance, connect it to computer via USB, and run `sudo ./main`. Draw the object box with mouse when program is running. One could see pictures as follows if everything goes well. Typing `q` on keyboard will quit the program. 
- 
-  ![Alt text](./Images/en/35.png) 
+- Power up Guidance, and connect it to computer via USB.
+- Make and run the project:
 
+		make
+		sudo ./main
+
+- Draw the object box with mouse when program is running. One could see pictures as follows if everything goes well. 
+
+	![Alt text](./Images/en/linux_run.jpg) 
+
+- Type `q` on keyboard will quit the program. 
