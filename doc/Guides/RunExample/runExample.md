@@ -4,11 +4,11 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 
 ## Run USB example in Linux
 
-1. **Setup the environment.**
+**1.** **Setup the environment.**
 
 	The Guidance SDK use _libusb-1.0.9_ library to read data from Guidance system. Please reference _[http://www.libusb.org](http://www.libusb.org/)_ to compile and install the _libusb-1.0.9_ library from source.
 
-2. **Copy related files.**
+**2.** **Copy related files.**
 
 	Makefiles are provided and tested. The user does not need to change anything to run the example code.
 
@@ -23,8 +23,7 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 	LDFLAGS = -Wl,-rpath,./ -lpthread -lrt -L./ -L/usr/local/lib/ -l **DJI\_guidance** -lusb-1.0
 	```
 
-
-3. **Compile the example project.**
+**3.** **Compile the example project.**
 
 	![](./Images/Guidance_SDK_API9210.png)
 
@@ -35,7 +34,7 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 	~~~
 
 
-4. **Connect Guidance via USB and run.**
+**4.** **Connect Guidance via USB and run.**
 
 	You need root permission to run this example if you have not added the `51-guidance.rules` file to `/etc/udev/rules.d/` directory as instructed in the `Developer Guide`.
 
@@ -48,11 +47,11 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 
 ## Run USB example in Windows
 
-1. **Setup the environment.**
+**1.** **Setup the environment.**
 
 	The Guidance SDK uses the _libusb_ library to read data from Guidance system. Please make sure the Guidance Assistant Software is installed properly which includes DJI USB driver for Guidance.
 
-2. **Configure Visual Studio.**
+**2.** **Configure Visual Studio.**
 
 	Solutions for different versions of Visual Studio are provided and tested. The user do not need to change anything to run the example code.
 
@@ -68,11 +67,11 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 	
 	![](./Images/Guidance_SDK_API11350.png)
 
-3. **Compile the example project.**
+**3.** **Compile the example project.**
 
 	Compile the example project using Microsoft Visual Studio.
 
-4. **Connect the Guidance system for testing.**
+**4.** **Connect the Guidance system for testing.**
 	
 	The results look like the following figure.
 
@@ -80,31 +79,31 @@ Guidance SDK have provided examples to get data from Guidance system. This secti
 
 ## Run UART example in Linux
 
-1. **Subscribe UART data.**
+**1.** **Subscribe UART data.**
 
 	Please reference Section 2.1.2 to activate UART.
 
-2. **Compile the example project.**
+**2.** **Compile the example project.**
 
 	Go to the directory `uart_example` and type `make`:
 
 	![](./Images/Guidance_SDK_API11655.png)
 
-3. **Connect the Guidance system for testing.**
+**3.** **Connect the Guidance system for testing.**
 
 	![](./Images/Guidance_SDK_API11699.png)
 
 ## Run UART example in Windows
 
-1. **Subscribe UART data.**
+**1.** **Subscribe UART data.**
 
 	Please reference Section 2.1.2 to activate UART.
 
-2. **Compile the example project.**
+**2.** **Compile the example project.**
 
 	Compile the example project using Microsoft Visual Studio.
 
-3. **Connect the Guidance system for testing.**
+**3.** **Connect the Guidance system for testing.**
 
 	The results look like the following figure.
 
