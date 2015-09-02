@@ -115,7 +115,7 @@ Linux默认包含了UART驱动，不需要另外安装。
 - 使用Guidance的USB接口时，需要使用`sudo`指令，以取得对USB接口的root权限。否则会出现*permission denied*的错误。
 例如:
 
-	>> sudo ./guidance_example
+	> sudo ./guidance_example
 - 为了避免每次都要使用sudo来运行Guidance SDK程序的麻烦，可以在`/etc/udev/rules.d/`文件夹中创建一个规则文件`51-guidance.rules`，内容如下：
 		
 	SUBSYSTEM=="usb", ATTR{idVendor}=="fff0", ATTR{idProduct}=="d009", MODE="0666"

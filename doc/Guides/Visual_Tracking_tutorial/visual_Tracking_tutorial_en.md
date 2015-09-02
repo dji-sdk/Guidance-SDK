@@ -1,4 +1,4 @@
-# Build a visual tracking project
+# Building a Visual Tracking Project
 
 This tutorial gives an example of building a visual tracking project using Guidance SDK step by step. It supports Windows and Linux.
 
