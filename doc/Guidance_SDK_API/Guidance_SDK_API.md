@@ -21,7 +21,7 @@ and you are:
 
 This section introduces the structure of the Guidance SDK. The SDK is divided into three layers:
 
-![](./image/Guidance_SDK_API3987.png)
+![](Images/Guidance_SDK_API3987.png)
 
 - **Application:** This layer processes data from the HAL layer. It is written by developers.
 - **HAL:** This layer packs/parses the data to/from the Driver layer. It is implemented by the sample code (for UART) or SDK library (for USB), e.g. _libDJI\_guidance.so_.
@@ -47,7 +47,7 @@ There are two ways to subscribe the data through USB.
 
 	**Notes:** The available bandwidth is subject to the selection of image data and the output frequency. The selection of subscribed image data and output frequency will be saved and take effect when the Guidance system is turned off and on again.
 
-	![](./image/Guidance_SDK_API5146.png)
+	![](Images/Guidance_SDK_API5146.png)
 
 2. Guidance API
 
@@ -65,7 +65,7 @@ The output data types of UART are Velocity Data, Obstacle Distance Data, IMU Dat
 
 	You may only use Guidance assistant software to subscribe UART data. Enable this selection from "DIY->API->UART" page. Same as USB, the configuration will be saved in Guidance Core, unless you de-select the "Enable" option in the "UART" tab.
 
-	![](./image/Guidance_SDK_API6086.png)
+	![](Images/Guidance_SDK_API6086.png)
 
 2. Protocol Description
 

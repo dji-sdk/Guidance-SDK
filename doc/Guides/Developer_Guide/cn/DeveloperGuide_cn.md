@@ -15,7 +15,7 @@ Guidance SDK软件包在GitHub上更新和维护。
 
 首先，在Windows平台下安装Guidance Assistant软件。软件在安装过程中会自动安装Guidance所需的USB驱动，在软件安装引导结束后需重启系统使之生效。系统重新启动后，将Guidance通过USB连至电脑并上电，进入**“计算机管理-设备管理器”**中查看，如果在设备列表中出现“DJI, Inc. - Guidance”，意味着软件安装成功。
 
-![Alt text](./images/1.png)
+![Alt text](./Images/1.png)
 
 #### 安装UART驱动
 如果要通过UART使用Guidance SDK，需要安装USB转RS232的驱动。使用过程中请注意，Guidance SDK中examples默认读取的串口号为**“COM5”**。如果您的计算机上的串口号与之不同，请修改代码中的设置或更改设备串口号。
@@ -25,13 +25,13 @@ Guidance SDK软件包在GitHub上更新和维护。
  
 - 首先，将Guidance连接至电脑并上电启动；接着等待Guidance上的绿灯开始闪烁后，打开Guidance Assistant软件，可以看到软件**“查看”**页面的左下角绿灯亮起，说明连接正常；此时将工作模式设置为**“自定义模式”**。
 
-![Alt text](./images/2.png)
+![Alt text](./Images/2.png)
 
 - 然后转到“自定义”页面，在“接口参数”选项卡中根据需要激活USB与UART，并通过勾选相应的选项来订阅图像数据及图像输出频率；图像数据及频率设置也可通过Guidance SDK中相应的API进行设置。
 
-![Alt text](./images/3.png)
+![Alt text](./Images/3.png)
 
-![Alt text](./images/4.png)
+![Alt text](./Images/4.png)
 
 - 关闭Guidance Assistant软件并重启Guidance使配置生效。
 
@@ -44,7 +44,7 @@ Guidance SDK分别在Opencv2.4.8、OpenCV2.4.9及OpenCV2.4.11上进行了测试�
 
 - 安装目录为**D:/OPENCV/opencv2411/build[sources]**，如下图所示，进入**“高级系统设置-环境变量-系统变量”**，新建一个变量，变量名为**OPENCVROOT**，值为 D:\OPENCV\opencv2411\
 
-![Alt text](./images/5.png)
+![Alt text](./Images/5.png)
 
 - 接着在系统变量的PATH变量尾部添加OpenCV的库目录，注意不同目录间用分号隔开: 
 **D:/OPENCV/opencv2411/build/x64/vc10/bin;**
@@ -54,7 +54,7 @@ Guidance SDK分别在Opencv2.4.8、OpenCV2.4.9及OpenCV2.4.11上进行了测试�
 #### 正确放置DJI\_guidance.dll
 >*务必记得将DJI\_guidance.dll拷贝至exe所在的目录，否则会显示无法找到DJI\_guidance.dll的错误。*
 
-![Alt text](./images/222.png)
+![Alt text](./Images/222.png)
 
 ### Linux
 
@@ -132,7 +132,7 @@ Linux默认包含了UART驱动，不需要另外安装。
 
 “usb error” 或者类似的报错，例如:
  
-![Alt text](./images/6.png)
+![Alt text](./Images/6.png)
 
 
 ***解决方法:***
@@ -191,7 +191,7 @@ Linux默认包含了UART驱动，不需要另外安装。
 
 数据传输错误一般指得到了不正确的数据，例如图像显示错误:
 
-![Alt text](./images/7.png)
+![Alt text](./Images/7.png)
 
 ***解决办法:***
 

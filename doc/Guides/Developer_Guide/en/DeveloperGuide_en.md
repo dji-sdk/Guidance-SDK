@@ -15,7 +15,7 @@ Guidance SDK is maintained and updated on GitHub.
 
 Install “Guidance Assistant” software firstly, which provides the USB driver under Windows platform. Restart your PC after installation, there will be **“DJI, Inc. - Guidance”** in Device Manager when Guidance is powered and connected to PC, which indicates the installation is successful.
 
-  ![Alt text](./images/1.png) 
+  ![Alt text](./Images/1.png) 
 
 #### Install UART Driver
 
@@ -27,15 +27,15 @@ Install **USB\_TO\_RS232** driver if you want to use SDK via UART. Notice that G
 
 -	Connect Guidance to PC and power it on. Open the “Guidance Assistant” software, wait until the light on the left-bottom green up and switch to **“DIY”** mode on the **view** page.
 
- ![Alt text](./images/2.png) 
+ ![Alt text](./Images/2.png) 
 
 -	Then change to **DIY** page, activate **USB** or **UART**, and subscribe the data you want.
 
 >*Notice: You can also subscribe data by API functions provided by the SDK package.*
 
- ![Alt text](./images/3.png) 
+ ![Alt text](./Images/3.png) 
 
- ![Alt text](./images/4.png) 
+ ![Alt text](./Images/4.png) 
 
 -	Close the software and restart Guidance to enable configure works. 
 
@@ -55,7 +55,7 @@ For example:
 
 -	Add **$(OPENCVROOT)** to your environment variables, i.e., create an environment variable, whose name is **OPENCVROOT** and value is **D:/OPENCV/opencv2411/**.
 
- ![Alt text](./images/5.png) 
+ ![Alt text](./Images/5.png) 
 
 - Then add the OpenCV bin path to your environment path. You should tails the follows to variable Path: 
 **D:/OPENCV/opencv2411/build/x64/vc10/bin;** 
@@ -66,7 +66,7 @@ For example:
 
 Remember to copy corresponding DJI\_guidance.dll to **/PATH/TO/YOUR/EXE**. Of course .dll, .h and .lib should be placed at correct places too.
 
- ![Alt text](./images/6.png) 
+ ![Alt text](./Images/6.png) 
 
 ### Linux
 
@@ -148,7 +148,7 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 ***Description:*** 
 **“usb error”** or things like that happen, for example:
 
- ![Alt text](./images/7.png) 
+ ![Alt text](./Images/7.png) 
 
 ***Solution:***
 
@@ -204,7 +204,7 @@ Check the configuration of OpenCV, remember that we use **$(OPENCVROOT)** as an 
 
 Data transfer error occurs means you may get a wrong image, for example:
 
-  ![Alt text](./images/8.png) 
+  ![Alt text](./Images/8.png) 
 
 ***Solution:*** 
 
