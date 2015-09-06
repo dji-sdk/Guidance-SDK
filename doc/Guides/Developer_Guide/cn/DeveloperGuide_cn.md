@@ -1,5 +1,7 @@
 # Guidance SDK开发者指南
 
+*如发现任何错误，请通过Github issue或开发者论坛或邮件反馈给我们。欢迎提交pull request来帮助我们修正问题，关于文档的修改需要符合[格式标准](https://github.com/dji-sdk/Guidance-SDK/issues/3)*
+
 ## SDK包下载
 
 Guidance SDK软件包在GitHub上更新和维护。

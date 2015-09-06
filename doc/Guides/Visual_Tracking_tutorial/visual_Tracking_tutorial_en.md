@@ -1,10 +1,12 @@
 # Building a Visual Tracking Project
 
+*In case of any mistake or bug, please report to us using Github issue or DJI forum or email. You are welcome to send your pull request helping us fix issue. However, all pull requests related to document must follow the [document style](https://github.com/dji-sdk/Guidance-SDK/issues/3)*
+
+---
+
 This tutorial gives an example of building a visual tracking project using Guidance SDK step by step. It supports Windows and Linux.
 
 A complete visual tracking project is already included in the **demo** folder. The user is encouraged to build and run the project first to get a feeling of how it would work. Then follow the instructions below to get the knowledge of how to build a Guidance SDK project from scratch. 
-
----
 
 ## Download and unzip SDK
 

@@ -1,5 +1,9 @@
 # 创建视觉跟踪程序
 
+*如发现任何错误，请通过Github issue或开发者论坛或邮件反馈给我们。欢迎提交pull request来帮助我们修正问题，关于文档的修改需要符合[格式标准](https://github.com/dji-sdk/Guidance-SDK/issues/3)*
+
+---
+
 这里我们要实现的功能是利用Guidance SDK中的API，通过USB从Guidance中读取图像数据，使用camshift完成一个视觉跟踪的应用。该教程支持Windows和Ubuntu系统。
 
 **demo**文件夹中已经有了一个完整的视觉跟踪的工程，用户可以直接编译运行这个工程，以便有一个整体的认识。然后依照下面的指示，从零开始建立一个视觉跟踪的工程。

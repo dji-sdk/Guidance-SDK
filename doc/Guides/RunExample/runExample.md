@@ -1,5 +1,9 @@
 # Run examples
 
+*In case of any mistake or bug, please report to us using Github issue or DJI forum or email. You are welcome to send your pull request helping us fix issue. However, all pull requests related to document must follow the [document style](https://github.com/dji-sdk/Guidance-SDK/issues/3)*
+
+---
+
 Guidance SDK have provided examples to get data from Guidance system. This section guides you how to execute these examples.
 
 ## Run USB example in Linux
