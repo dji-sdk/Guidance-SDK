@@ -1,20 +1,18 @@
 
 # Guidance SDK Documentation
 
-*In case of any mistake or bug, please report to us using Github issue or DJI forum or email. You are welcome to send your pull request helping us fix issue. However, all pull requests related to document must follow the [document style](https://github.com/dji-sdk/Guidance-SDK/issues/3)*
+*In case of any mistake or bug, please report to us using Github issue or DJI forum or email. You are welcome to send your pull request helping us fix issue. However, all pull requests related to document must follow the [document style](https://github.com/dji-sdk/Guidance-SDK/issues/3)*.
 
 ## Background
 
 This guide assumes that you have
 
 - a Guidance system,
-
 - a computer with OpenCV installed,
 
 and you are:
 
 - familiar with Linux programming,
-
 - or familiar with Windows programming and Microsoft Visual Studio.
 
 
@@ -25,7 +23,7 @@ This section introduces the structure of the Guidance SDK. The SDK is divided in
 ![](Images/Guidance_SDK_API3987.png)
 
 - **Application:** This layer processes data from the HAL layer. It is written by developers.
-- **HAL:** This layer packs/parses the data to/from the Driver layer. It is implemented by the sample code (for UART) or SDK library (for USB), e.g. _libDJI\_guidance.so_.
+- **HAL:** Hardware Abstraction Layer. This layer packs/parses the data to/from the Driver layer. It is implemented by the sample code (for UART) or SDK library (for USB), e.g. _libDJI\_guidance.so_.
 - **Driver:** This layer receives data from the Guidance system through USB/UART. It is implemented by OS or 3rd party libraries, e.g. _libusb_.
 
 ### Interface
