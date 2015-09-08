@@ -35,7 +35,7 @@ Structure
 -	**lib**: Library files for Windows
 -	**so**: Library files for Linux
 
-Also notice that, to enable fast download for ROS users, we have a separate ROS repo with much smaller size: [GuidanceSDKROS](https://github.com/dji-sdk/GuidanceSDKROS).
+Also notice that, to enable fast download for ROS users, we have a separate ROS repo with much smaller size: [Guidance-SDK-ROS](https://github.com/dji-sdk/Guidance-SDK-ROS).
 
 Usage
 =========
@@ -46,7 +46,5 @@ Examples of USB and UART can be found in *examples/usb\_example*, *examples/uart
 ### Linux ###
 
 Examples of USB and UART can be found in *examples/usb\_example*, *examples/uart\_example*,	including Makefile which is ready to compile. 
-
-A **ROS** package is also included in *examples/RosNode*.
 
 
