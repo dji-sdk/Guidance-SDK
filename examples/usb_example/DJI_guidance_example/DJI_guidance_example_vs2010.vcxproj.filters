@@ -23,9 +23,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DJI_guidance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DJI_utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
