@@ -1,0 +1,8 @@
+prefix=/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/install
+
+Name: dji_sdk
+Description: Description of dji_sdk
+Version: 0.0.0
+Cflags: -I/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/install/include
+Libs: -L/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/install/lib -ldji_sdk
+Requires: std_msgs

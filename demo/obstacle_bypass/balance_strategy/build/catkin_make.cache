@@ -1,0 +1,2 @@
+dji_sdk
+-DCATKIN_DEVEL_PREFIX=/home/dji/obstacle_avoidance/control/balance-without_outliers-of-multiframe/devel -DCMAKE_INSTALL_PREFIX=/home/dji/obstacle_avoidance/control/balance-without_outliers-of-multiframe/install -G Unix Makefiles
