@@ -104,14 +104,6 @@ double r_turn = 0; // right image turn control
 double r_alt = 0; // right image altitude control
 double turn_prev = 0; // previous yaw for weighted camera observation
 
-// control strategy
-#define NONE 0 // no control
-#define CTRL 1 // baseline control
-#define PAUSE_CTRL 2 // stop moving at each obstacle and turn until obstacle is outside FOV
-#define RATIO_CTRL 3 // multiply avoidance maneuver by ratio of optical flow difference
-int ctrl_strat = RATIO_CTRL;
-// #define NO_ALT_CTRL
-
 /*************************************/
 
 /*
@@ -399,74 +391,26 @@ int guidance_callback(int data_type, int data_len, char *content)
 					if(1.0 - right_of/left_of > OF_MARGIN)
 					{
 						ctrl_text += " RIGHT";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!l_kpt_regen)
-							{
-								l_fwd = 0;
-								l_turn = TURN;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(turn_prev > 0) l_turn = (1 + (left_of - right_of)/(left_of + right_of))*turn_prev;
-							else l_turn = TURN;
-						}
-						else if(ctrl_strat == CTRL) l_turn = TURN;
+						if(turn_prev > 0) l_turn = (1 + (left_of - right_of)/(left_of + right_of))*turn_prev;
+						else l_turn = TURN;
 					}
 					else if(1.0 - left_of/right_of > OF_MARGIN)
 					{
 						ctrl_text += " LEFT";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!l_kpt_regen)
-							{
-								l_fwd = 0;
-								l_turn = -1.0*TURN;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(turn_prev < 0) l_turn = (1 + (right_of - left_of)/(right_of + left_of))*turn_prev;
-							else l_turn = -1.0*TURN;
-						}
-						else if(ctrl_strat == CTRL) l_turn = -1.0*TURN;
+						if(turn_prev < 0) l_turn = (1 + (right_of - left_of)/(right_of + left_of))*turn_prev;
+						else l_turn = -1.0*TURN;
 					}
 					if(1.0 - down_of/up_of > OF_MARGIN)
 					{
 						ctrl_text += " DOWN";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!l_kpt_regen)
-							{
-								l_fwd = 0;
-								l_alt = -1.0*ALT;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(alt_prev < 0) l_alt = (1 + (up_of - down_of)/(up_of + down_of))*alt_prev;
-							else l_alt = -1.0*ALT;
-						}
-						else if(ctrl_strat == CTRL) l_alt = -1.0*ALT;
+						if(alt_prev < 0) l_alt = (1 + (up_of - down_of)/(up_of + down_of))*alt_prev;
+						else l_alt = -1.0*ALT;
 					}
 					else if(1.0 - up_of/down_of > OF_MARGIN)
 					{
 						ctrl_text += " UP";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!l_kpt_regen)
-							{
-								l_fwd = 0;
-								l_alt = ALT;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(alt_prev > 0) l_alt = (1 + (down_of - up_of)/(down_of + up_of))*alt_prev;
-							else l_alt = ALT;
-						}
-						else if(ctrl_strat == CTRL) l_alt = ALT;
+						if(alt_prev > 0) l_alt = (1 + (down_of - up_of)/(down_of + up_of))*alt_prev;
+						else l_alt = ALT;
 					}
 					if(ctrl_text.compare("GO") == 0) ctrl_text += " STRAIGHT";
 
@@ -622,74 +566,26 @@ int guidance_callback(int data_type, int data_len, char *content)
 					if(1.0 - right_of/left_of > OF_MARGIN)
 					{
 						ctrl_text += " RIGHT";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!r_kpt_regen)
-							{
-								r_fwd = 0;
-								r_turn = TURN;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(turn_prev > 0) r_turn = (1 + (left_of - right_of)/(left_of + right_of))*turn_prev;
-							else r_turn = TURN;
-						}
-						else if(ctrl_strat == CTRL) r_turn = TURN;
+						if(turn_prev > 0) r_turn = (1 + (left_of - right_of)/(left_of + right_of))*turn_prev;
+						else r_turn = TURN;
 					}
 					else if(1.0 - left_of/right_of > OF_MARGIN)
 					{
 						ctrl_text += " LEFT";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!r_kpt_regen)
-							{
-								r_fwd = 0;
-								r_turn = -1.0*TURN;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(turn_prev < 0) r_turn = (1 + (right_of - left_of)/(right_of + left_of))*turn_prev;
-							else r_turn = -1.0*TURN;
-						}
-						else if(ctrl_strat == CTRL) r_turn = -1.0*TURN;
+						if(turn_prev < 0) r_turn = (1 + (right_of - left_of)/(right_of + left_of))*turn_prev;
+						else r_turn = -1.0*TURN;
 					}
 					if(1.0 - down_of/up_of > OF_MARGIN)
 					{
 						ctrl_text += " DOWN";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!r_kpt_regen)
-							{
-								r_fwd = 0;
-								r_alt = -1.0*ALT;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(alt_prev < 0) r_alt = (1 + (up_of - down_of)/(up_of + down_of))*alt_prev;
-							else r_alt = -1.0*ALT;
-						}
-						else if(ctrl_strat == CTRL) r_alt = -1.0*ALT;
+						if(alt_prev < 0) r_alt = (1 + (up_of - down_of)/(up_of + down_of))*alt_prev;
+						else r_alt = -1.0*ALT;
 					}
 					else if(1.0 - up_of/down_of > OF_MARGIN)
 					{
 						ctrl_text += " UP";
-						if(ctrl_strat == PAUSE_CTRL)
-						{
-							if(!r_kpt_regen)
-							{
-								r_fwd = 0;
-								r_alt = ALT;
-							}
-						}
-						else if(ctrl_strat == RATIO_CTRL)
-						{
-							if(alt_prev > 0) r_alt = (1 + (down_of - up_of)/(down_of + up_of))*alt_prev;
-							else r_alt = ALT;
-						}
-						else if(ctrl_strat == CTRL) r_alt = ALT;
+						if(alt_prev > 0) r_alt = (1 + (down_of - up_of)/(down_of + up_of))*alt_prev;
+						else r_alt = ALT;
 					}
 					if(ctrl_text.compare("GO") == 0) ctrl_text += " STRAIGHT";
 
