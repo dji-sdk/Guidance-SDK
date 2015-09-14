@@ -76,18 +76,33 @@ int			iter = 0;
 DJI_lock    g_lock;
 DJI_event   g_event;
 
+// cells
+#define CELL_ROWS 20
+#define CELL_COLS 20
+struct cell
+{
+	double of_x; // optical flow x
+	double of_y; // optical flow y
+	uint count; // number of keypoints
+	bool disc; // discontinuity
+};
+cell of_cells[CELL_ROWS][CELL_COLS];
+#define OF_MARGIN (double) 0.5 // 2 optical flow values considered different if their difference exceeds this margin
+#define DISC_MARGIN (double) 0.5 // a cell considered discontinous if the proportion of neighboring cells with different optical flow values exceeds this margin
+#define MAX_NEIGH_DIST 1 // max distance allowed between two cells to be considered neighbors
+#define MAX_DISC (double) 0.7 // max proportion of discontinuous cells allowed for drone to continue maneuvering
+
 // Shi-Tomasi
-#define MIN_CORNERS (uint) 15
-#define CORNER_THRESHOLD (uint) 95
-#define MAX_CORNERS (uint) 100
+#define MIN_CORNERS (uint) 30
+#define CORNER_THRESHOLD (uint) 190
+#define MAX_CORNERS (uint) 200
 #define QUALITY_LEVEL (double) 0.01
 #define MIN_DISTANCE (double) 1
 
 // Lucas-Kanade
 int frame_num = 0;
-vector<Point2f> prevleftpts, prevrightpts;
+vector<Point2f> prevleftpts, prevrightpts, prevlefttracked, prevrighttracked;
 Mat prevleftimg, prevrightimg;
-#define OF_MARGIN (double) 0.5 // 2 optical flow values considered different if their difference exceeds this margin
 bool l_kpt_regen = true;
 bool r_kpt_regen = true;
 
@@ -95,14 +110,13 @@ bool r_kpt_regen = true;
 #define CMD_FLAG 0x4A // control horizontal/vertical velocity in body frame and yaw rate in ground frame
 #define FWD (double) 0.5 // constant horizontal velocity
 #define TURN (double) 10 // constant yaw rate
-#define ALT (double) 0.01 // constant vertical velocity
+#define ALT (double) 0.1 // constant vertical velocity
 double l_fwd = FWD; // left image forward control
 double l_turn = 0; // left image turn control
 double l_alt = 0; // left image altitude control
 double r_fwd = FWD; // right image forward control
 double r_turn = 0; // right image turn control
 double r_alt = 0; // right image altitude control
-double turn_prev = 0; // previous yaw for weighted camera observation
 
 /*************************************/
 
@@ -307,11 +321,6 @@ int guidance_callback(int data_type, int data_len, char *content)
 				// control text
 				string ctrl_text = "";
 
-				// potential obstacle display
-				vector<Point2f> kpts;
-				vector<double> kpt_of;
-				double left_avg, right_avg, up_avg, down_avg;
-
 				/* Lucas-Kanade */
 
 				if(prevleftpts.size() < MIN_CORNERS)
@@ -337,10 +346,31 @@ int guidance_callback(int data_type, int data_len, char *content)
 					ctrl_text = "GO";
 					double left_of_x = 0, left_of_y = 0, right_of_x = 0, right_of_y = 0, up_of_x = 0, up_of_y = 0, down_of_x = 0, down_of_y = 0;
 					int left_count = 0, right_count = 0, up_count = 0, down_count = 0;
+					// populating cell data
+					for(int row = 0; row < CELL_ROWS; row++)
+					{
+						for(int col = 0; col < CELL_COLS; col++)
+						{
+							of_cells[row][col].of_x = 0;
+							of_cells[row][col].of_y = 0;
+							of_cells[row][col].count = 0;
+							of_cells[row][col].disc = false;
+						}
+					}
 					for(size_t i = 0; i < LKleftpts.size(); i++)
 					{
-						if(LKleftpts[i].x >= 0 && LKleftpts[i].x <= WIDTH && LKleftpts[i].y >= 0 && LKleftpts[i].y <= HEIGHT)
+						if(LKleftpts[i].x >= 0 && LKleftpts[i].y >= 0 && LKleftpts[i].x <= WIDTH && LKleftpts[i].y <= HEIGHT)
 						{
+							// calculating corresponding cell and optical flow
+							int row = LKleftpts[i].y*CELL_ROWS/HEIGHT;
+							int col = LKleftpts[i].x*CELL_COLS/WIDTH;
+							double of_x = LKleftpts[i].x - prevleftpts[i].x;
+							double of_y = LKleftpts[i].y - prevleftpts[i].y;
+							// updating cell
+							of_cells[row][col].of_x += of_x;
+							of_cells[row][col].of_y += of_y;
+							of_cells[row][col].count++;
+							// saving optical flow values for control feedback
 							if(LKleftpts[i].x < (double)WIDTH/2.0)
 							{
 								left_of_x += LKleftpts[i].x - prevleftpts[i].x;
@@ -365,9 +395,6 @@ int guidance_callback(int data_type, int data_len, char *content)
 								down_of_y += LKleftpts[i].y - prevleftpts[i].y;
 								down_count++;
 							}
-
-							kpts.push_back(LKleftpts[i]);
-							kpt_of.push_back(pow(pow(LKleftpts[i].x - prevleftpts[i].x, 2) + pow(LKleftpts[i].y - prevleftpts[i].y, 2), 0.5));
 						}
 					}
 					left_of_x /= (double)left_count;
@@ -382,52 +409,120 @@ int guidance_callback(int data_type, int data_len, char *content)
 					down_of_x /= (double)down_count;
 					down_of_y /= (double)down_count;
 					double down_of = pow(pow(down_of_x, 2) + pow(down_of_y, 2), 0.5);
-					// move away from high image section optical flow
+					// finding discontinuous cells
+					int left_disc = 0, right_disc = 0, up_disc = 0, down_disc = 0;
+					for(int row = 0; row < CELL_ROWS; row++)
+					{
+						for(int col = 0; col < CELL_COLS; col++)
+						{
+							int neighbor_count = 0;
+							int neighbor_diff = 0;
+							// iterating over neighbor cells
+							for(int x_dist = -1*MAX_NEIGH_DIST; x_dist <= MAX_NEIGH_DIST; x_dist++)
+							{
+								for(int y_dist = -1*MAX_NEIGH_DIST; y_dist <= MAX_NEIGH_DIST; y_dist++)
+								{
+									if(x_dist == 0 && y_dist == 0) continue; // do not count self as neighbor
+									if(row - y_dist < 0 || row + y_dist > CELL_ROWS - 1 || col - x_dist < 0 || col + x_dist > CELL_COLS - 1) continue; // do not exceed boundaries
+									// assign shorter vector as a and longer vector as b
+									double a_x;
+									double a_y;
+									double b_x;
+									double b_y;
+									if(pow((pow(of_cells[row][col].of_x, 2) + pow(of_cells[row][col].of_y, 2))/pow((double)of_cells[row][col].count, 2), 0.5) < pow((pow(of_cells[row + y_dist][col + x_dist].of_x, 2) + pow(of_cells[row + y_dist][col + x_dist].of_y, 2))/pow((double)of_cells[row + y_dist][col + x_dist].count, 2), 0.5))
+									{
+										a_x = of_cells[row][col].of_x/(double)of_cells[row][col].count;
+										a_y = of_cells[row][col].of_y/(double)of_cells[row][col].count;
+										b_x = of_cells[row + y_dist][col + x_dist].of_x/(double)of_cells[row + y_dist][col + x_dist].count;
+										b_y = of_cells[row + y_dist][col + x_dist].of_y/(double)of_cells[row + y_dist][col + x_dist].count;
+									}
+									else
+									{
+										b_x = of_cells[row][col].of_x/(double)of_cells[row][col].count;
+										b_y = of_cells[row][col].of_y/(double)of_cells[row][col].count;
+										a_x = of_cells[row + y_dist][col + x_dist].of_x/(double)of_cells[row + y_dist][col + x_dist].count;
+										a_y = of_cells[row + y_dist][col + x_dist].of_y/(double)of_cells[row + y_dist][col + x_dist].count;
+									}
+									if(1.0 - (a_x*b_x + a_y*b_y)/(pow(b_x, 2) + pow(b_y, 2)) > OF_MARGIN) neighbor_diff++;
+								}
+							}
+							if((double)neighbor_diff/(double)neighbor_count > DISC_MARGIN)
+							{
+								if(CELL_COLS/(col + 1) >= 2)
+								{
+									left_disc++;
+								}
+								else
+								{
+									right_disc++;
+								}
+								if(CELL_ROWS/(row + 1) >= 2)
+								{
+									up_disc++;
+								}
+								else
+								{
+									down_disc++;
+								}
+								of_cells[row][col].disc = true;
+							}
+						}
+					}
+					// move away from high image section discontinuity
 					l_fwd = FWD;
 					double turn_prev = l_turn;
 					double alt_prev = l_alt;
 					l_turn = 0;
 					l_alt = 0;
-					if(1.0 - right_of/left_of > OF_MARGIN)
+					if(left_disc > right_disc)
 					{
 						ctrl_text += " RIGHT";
 						if(turn_prev > 0) l_turn = (1 + (left_of - right_of)/(left_of + right_of))*turn_prev;
 						else l_turn = TURN;
 					}
-					else if(1.0 - left_of/right_of > OF_MARGIN)
+					else if(right_disc > left_disc)
 					{
 						ctrl_text += " LEFT";
 						if(turn_prev < 0) l_turn = (1 + (right_of - left_of)/(right_of + left_of))*turn_prev;
 						else l_turn = -1.0*TURN;
 					}
-					if(1.0 - down_of/up_of > OF_MARGIN)
+					if(up_disc > down_disc)
 					{
 						ctrl_text += " DOWN";
 						if(alt_prev < 0) l_alt = (1 + (up_of - down_of)/(up_of + down_of))*alt_prev;
 						else l_alt = -1.0*ALT;
 					}
-					else if(1.0 - up_of/down_of > OF_MARGIN)
+					else if(down_disc > up_disc)
 					{
 						ctrl_text += " UP";
 						if(alt_prev > 0) l_alt = (1 + (down_of - up_of)/(down_of + up_of))*alt_prev;
 						else l_alt = ALT;
 					}
+					if((double)(left_disc + right_disc + up_disc + down_disc)/(double)(CELL_ROWS*CELL_COLS) > MAX_DISC)
+					{
+						ctrl_text = "STOP MOVING";
+						l_fwd = 0;
+						l_turn = 0;
+						l_alt = 0;
+					}
 					if(ctrl_text.compare("GO") == 0) ctrl_text += " STRAIGHT";
 
-					left_avg = left_of;
-					right_avg = right_of;
-					up_avg = up_of;
-					down_avg = down_of;
+					prevlefttracked.assign(LKleftpts.begin(), LKleftpts.end());
 				}
 
 				/* Shi-Tomasi */
-
+				
 				vector<Point2f> left_corners;
 				if(frame_num > 0)
 				{
-					if(kpts.size() >= CORNER_THRESHOLD)
+					vector<Point2f> tracked_left_corners;
+					for(size_t i = 0; i < prevlefttracked.size(); i++)
 					{
-						left_corners.assign(kpts.begin(), kpts.end()); // retain previously tracked keypoints
+						if(prevlefttracked[i].x >= 0 && prevlefttracked[i].x <= WIDTH && prevlefttracked[i].y >= 0 && prevlefttracked[i].y <= HEIGHT) tracked_left_corners.push_back(prevlefttracked[i]);
+					}
+					if(tracked_left_corners.size() >= CORNER_THRESHOLD)
+					{
+						left_corners.assign(tracked_left_corners.begin(), tracked_left_corners.end()); // retain previously tracked keypoints
 						l_kpt_regen = false;
 					}
 					else
@@ -447,27 +542,25 @@ int guidance_callback(int data_type, int data_len, char *content)
 				}
 				g_greyscale_image_left.copyTo(prevleftimg);
 				prevleftpts.assign(left_corners.begin(), left_corners.end());
-				// potential obstacle display
-				for(size_t i = 0; i < kpts.size(); i++)
+				// cells display
+				for(int row = 1; row < CELL_ROWS; row++)
 				{
-					bool draw_obstacle = false;
-					if(kpts[i].x < (double)WIDTH/2.0)
+					line(left_rgb, Point2f(0, row*HEIGHT/CELL_ROWS), Point2f(WIDTH, row*HEIGHT/CELL_ROWS), Scalar(0, 0, 255));
+				}
+				for(int col = 1; col < CELL_COLS; col++)
+				{
+					line(left_rgb, Point2f(col*WIDTH/CELL_COLS, 0), Point2f(col*WIDTH/CELL_COLS, HEIGHT), Scalar(0, 0, 255));
+				}
+				for(int row = 0; row < CELL_ROWS; row++)
+				{
+					for(int col = 0; col < CELL_COLS; col++)
 					{
-						if(1.0 - right_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
+						if(of_cells[row][col].disc)
+						{
+							line(left_rgb, Point2f(col*WIDTH/CELL_COLS, row*HEIGHT/CELL_ROWS), Point2f((col + 1)*WIDTH/CELL_COLS, (row + 1)*HEIGHT/CELL_ROWS), Scalar(0, 0, 255));
+							line(left_rgb, Point2f((col + 1)*WIDTH/CELL_COLS, row*HEIGHT/CELL_ROWS), Point2f(col*WIDTH/CELL_COLS, (row + 1)*HEIGHT/CELL_ROWS), Scalar(0, 0, 255));
+						}
 					}
-					else
-					{
-						if(1.0 - left_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
-					}
-					if(kpts[i].y < (double)HEIGHT/2.0)
-					{
-						if(1.0 - down_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
-					}
-					else
-					{
-						if(1.0 - up_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
-					}
-					if(draw_obstacle) rectangle(left_rgb, Point2f(kpts[i].x - 5, kpts[i].y - 5), Point2f(kpts[i].x + 5, kpts[i].y + 5), Scalar(0, 0, 255), -1);
 				}
 				// control display
 				putText(left_rgb, ctrl_text, Point2f(10, HEIGHT - 10), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 3, 3);
@@ -481,11 +574,6 @@ int guidance_callback(int data_type, int data_len, char *content)
 
 				// control text
 				string ctrl_text = "";
-
-				// potential obstacle display
-				vector<Point2f> kpts;
-				vector<double> kpt_of;
-				double left_avg, right_avg, up_avg, down_avg;
 
 				/* Lucas-Kanade */
 				
@@ -512,10 +600,31 @@ int guidance_callback(int data_type, int data_len, char *content)
 					ctrl_text = "GO";
 					double left_of_x = 0, left_of_y = 0, right_of_x = 0, right_of_y = 0, up_of_x = 0, up_of_y = 0, down_of_x = 0, down_of_y = 0;
 					int left_count = 0, right_count = 0, up_count = 0, down_count = 0;
+					// populating cell data
+					for(int row = 0; row < CELL_ROWS; row++)
+					{
+						for(int col = 0; col < CELL_COLS; col++)
+						{
+							of_cells[row][col].of_x = 0;
+							of_cells[row][col].of_y = 0;
+							of_cells[row][col].count = 0;
+							of_cells[row][col].disc = false;
+						}
+					}
 					for(size_t i = 0; i < LKrightpts.size(); i++)
 					{
-						if(LKrightpts[i].x >= 0 && LKrightpts[i].x <= WIDTH && LKrightpts[i].y >= 0 && LKrightpts[i].y <= HEIGHT)
+						if(LKrightpts[i].x >= 0 && LKrightpts[i].y >= 0 && LKrightpts[i].x <= WIDTH && LKrightpts[i].y <= HEIGHT)
 						{
+							// calculating corresponding cell and optical flow
+							int row = LKrightpts[i].y*CELL_ROWS/HEIGHT;
+							int col = LKrightpts[i].x*CELL_COLS/WIDTH;
+							double of_x = LKrightpts[i].x - prevrightpts[i].x;
+							double of_y = LKrightpts[i].y - prevrightpts[i].y;
+							// updating cell
+							of_cells[row][col].of_x += of_x;
+							of_cells[row][col].of_y += of_y;
+							of_cells[row][col].count++;
+							// saving optical flow values for control feedback
 							if(LKrightpts[i].x < (double)WIDTH/2.0)
 							{
 								left_of_x += LKrightpts[i].x - prevrightpts[i].x;
@@ -540,9 +649,6 @@ int guidance_callback(int data_type, int data_len, char *content)
 								down_of_y += LKrightpts[i].y - prevrightpts[i].y;
 								down_count++;
 							}
-
-							kpts.push_back(LKrightpts[i]);
-							kpt_of.push_back(pow(pow(LKrightpts[i].x - prevrightpts[i].x, 2) + pow(LKrightpts[i].y - prevrightpts[i].y, 2), 0.5));
 						}
 					}
 					left_of_x /= (double)left_count;
@@ -557,42 +663,105 @@ int guidance_callback(int data_type, int data_len, char *content)
 					down_of_x /= (double)down_count;
 					down_of_y /= (double)down_count;
 					double down_of = pow(pow(down_of_x, 2) + pow(down_of_y, 2), 0.5);
-					// move away from high image section optical flow
+					// finding discontinuous cells
+					int left_disc = 0, right_disc = 0, up_disc = 0, down_disc = 0;
+					for(int row = 0; row < CELL_ROWS; row++)
+					{
+						for(int col = 0; col < CELL_COLS; col++)
+						{
+							int neighbor_count = 0;
+							int neighbor_diff = 0;
+							// iterating over neighbor cells
+							for(int x_dist = -1*MAX_NEIGH_DIST; x_dist <= MAX_NEIGH_DIST; x_dist++)
+							{
+								for(int y_dist = -1*MAX_NEIGH_DIST; y_dist <= MAX_NEIGH_DIST; y_dist++)
+								{
+									if(x_dist == 0 && y_dist == 0) continue; // do not count self as neighbor
+									if(row - y_dist < 0 || row + y_dist > CELL_ROWS - 1 || col - x_dist < 0 || col + x_dist > CELL_COLS - 1) continue; // do not exceed boundaries
+									// assign shorter vector as a and longer vector as b
+									double a_x;
+									double a_y;
+									double b_x;
+									double b_y;
+									if(pow((pow(of_cells[row][col].of_x, 2) + pow(of_cells[row][col].of_y, 2))/pow((double)of_cells[row][col].count, 2), 0.5) < pow((pow(of_cells[row + y_dist][col + x_dist].of_x, 2) + pow(of_cells[row + y_dist][col + x_dist].of_y, 2))/pow((double)of_cells[row + y_dist][col + x_dist].count, 2), 0.5))
+									{
+										a_x = of_cells[row][col].of_x/(double)of_cells[row][col].count;
+										a_y = of_cells[row][col].of_y/(double)of_cells[row][col].count;
+										b_x = of_cells[row + y_dist][col + x_dist].of_x/(double)of_cells[row + y_dist][col + x_dist].count;
+										b_y = of_cells[row + y_dist][col + x_dist].of_y/(double)of_cells[row + y_dist][col + x_dist].count;
+									}
+									else
+									{
+										b_x = of_cells[row][col].of_x/(double)of_cells[row][col].count;
+										b_y = of_cells[row][col].of_y/(double)of_cells[row][col].count;
+										a_x = of_cells[row + y_dist][col + x_dist].of_x/(double)of_cells[row + y_dist][col + x_dist].count;
+										a_y = of_cells[row + y_dist][col + x_dist].of_y/(double)of_cells[row + y_dist][col + x_dist].count;
+									}
+									if(1.0 - (a_x*b_x + a_y*b_y)/(pow(b_x, 2) + pow(b_y, 2)) > OF_MARGIN) neighbor_diff++;
+								}
+							}
+							if((double)neighbor_diff/(double)neighbor_count > DISC_MARGIN)
+							{
+								if(CELL_COLS/(col + 1) >= 2)
+								{
+									left_disc++;
+								}
+								else
+								{
+									right_disc++;
+								}
+								if(CELL_ROWS/(row + 1) >= 2)
+								{
+									up_disc++;
+								}
+								else
+								{
+									down_disc++;
+								}
+								of_cells[row][col].disc = true;
+							}
+						}
+					}
+					// move away from high image section discontinuity
 					r_fwd = FWD;
 					double turn_prev = r_turn;
 					double alt_prev = r_alt;
 					r_turn = 0;
 					r_alt = 0;
-					if(1.0 - right_of/left_of > OF_MARGIN)
+					if(left_disc > right_disc)
 					{
 						ctrl_text += " RIGHT";
 						if(turn_prev > 0) r_turn = (1 + (left_of - right_of)/(left_of + right_of))*turn_prev;
 						else r_turn = TURN;
 					}
-					else if(1.0 - left_of/right_of > OF_MARGIN)
+					else if(right_disc > left_disc)
 					{
 						ctrl_text += " LEFT";
 						if(turn_prev < 0) r_turn = (1 + (right_of - left_of)/(right_of + left_of))*turn_prev;
 						else r_turn = -1.0*TURN;
 					}
-					if(1.0 - down_of/up_of > OF_MARGIN)
+					if(up_disc > down_disc)
 					{
 						ctrl_text += " DOWN";
 						if(alt_prev < 0) r_alt = (1 + (up_of - down_of)/(up_of + down_of))*alt_prev;
 						else r_alt = -1.0*ALT;
 					}
-					else if(1.0 - up_of/down_of > OF_MARGIN)
+					else if(down_disc > up_disc)
 					{
 						ctrl_text += " UP";
 						if(alt_prev > 0) r_alt = (1 + (down_of - up_of)/(down_of + up_of))*alt_prev;
 						else r_alt = ALT;
 					}
+					if((double)(left_disc + right_disc + up_disc + down_disc)/(double)(CELL_ROWS*CELL_COLS) > MAX_DISC)
+					{
+						ctrl_text = "STOP MOVING";
+						r_fwd = 0;
+						r_turn = 0;
+						r_alt = 0;
+					}
 					if(ctrl_text.compare("GO") == 0) ctrl_text += " STRAIGHT";
 
-					left_avg = left_of;
-					right_avg = right_of;
-					up_avg = up_of;
-					down_avg = down_of;
+					prevrighttracked.assign(LKrightpts.begin(), LKrightpts.end());
 				}
 
 				/* Shi-Tomasi */
@@ -600,9 +769,14 @@ int guidance_callback(int data_type, int data_len, char *content)
 				vector<Point2f> right_corners;
 				if(frame_num > 0)
 				{
-					if(kpts.size() >= CORNER_THRESHOLD)
+					vector<Point2f> tracked_right_corners;
+					for(size_t i = 0; i < prevrighttracked.size(); i++)
 					{
-						right_corners.assign(kpts.begin(), kpts.end()); // retain previously tracked keypoints
+						if(prevrighttracked[i].x >= 0 && prevrighttracked[i].x <= WIDTH && prevrighttracked[i].y >= 0 && prevrighttracked[i].y <= HEIGHT) tracked_right_corners.push_back(prevrighttracked[i]);
+					}
+					if(tracked_right_corners.size() >= CORNER_THRESHOLD)
+					{
+						right_corners.assign(tracked_right_corners.begin(), tracked_right_corners.end()); // retain previously tracked keypoints
 						r_kpt_regen = false;
 					}
 					else
@@ -611,7 +785,7 @@ int guidance_callback(int data_type, int data_len, char *content)
 						r_kpt_regen = true;
 					}
 				}
-
+				
 				// allow for color overlaid on greyscale image
 				Mat right_rgb(g_greyscale_image_right.size(), CV_8UC3);
 				cvtColor(g_greyscale_image_right, right_rgb, CV_GRAY2RGB);
@@ -622,27 +796,25 @@ int guidance_callback(int data_type, int data_len, char *content)
 				}
 				g_greyscale_image_right.copyTo(prevrightimg);
 				prevrightpts.assign(right_corners.begin(), right_corners.end());
-				// potential obstacle display
-				for(size_t i = 0; i < kpts.size(); i++)
+				// cells display
+				for(int row = 1; row < CELL_ROWS; row++)
 				{
-					bool draw_obstacle = false;
-					if(kpts[i].x < (double)WIDTH/2.0)
+					line(right_rgb, Point2f(0, row*HEIGHT/CELL_ROWS), Point2f(WIDTH, row*HEIGHT/CELL_ROWS), Scalar(0, 0, 255));
+				}
+				for(int col = 1; col < CELL_COLS; col++)
+				{
+					line(right_rgb, Point2f(col*WIDTH/CELL_COLS, 0), Point2f(col*WIDTH/CELL_COLS, HEIGHT), Scalar(0, 0, 255));
+				}
+				for(int row = 0; row < CELL_ROWS; row++)
+				{
+					for(int col = 0; col < CELL_COLS; col++)
 					{
-						if(1.0 - right_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
+						if(of_cells[row][col].disc)
+						{
+							line(right_rgb, Point2f(col*WIDTH/CELL_COLS, row*HEIGHT/CELL_ROWS), Point2f((col + 1)*WIDTH/CELL_COLS, (row + 1)*HEIGHT/CELL_ROWS), Scalar(0, 0, 255));
+							line(right_rgb, Point2f((col + 1)*WIDTH/CELL_COLS, row*HEIGHT/CELL_ROWS), Point2f(col*WIDTH/CELL_COLS, (row + 1)*HEIGHT/CELL_ROWS), Scalar(0, 0, 255));
+						}
 					}
-					else
-					{
-						if(1.0 - left_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
-					}
-					if(kpts[i].y < (double)HEIGHT/2.0)
-					{
-						if(1.0 - down_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
-					}
-					else
-					{
-						if(1.0 - up_avg/kpt_of[i] > OF_MARGIN) draw_obstacle = true;
-					}
-					if(draw_obstacle) rectangle(right_rgb, Point2f(kpts[i].x - 5, kpts[i].y - 5), Point2f(kpts[i].x + 5, kpts[i].y + 5), Scalar(0, 0, 255), -1);
 				}
 				// control display
 				putText(right_rgb, ctrl_text, Point2f(10, HEIGHT - 10), FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 3, 3);
