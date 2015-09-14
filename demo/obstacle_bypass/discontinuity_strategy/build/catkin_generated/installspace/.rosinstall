@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/install/setup.sh

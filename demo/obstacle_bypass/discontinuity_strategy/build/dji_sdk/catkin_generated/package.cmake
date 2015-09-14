@@ -1,0 +1,7 @@
+set(_CATKIN_CURRENT_PACKAGE "dji_sdk")
+set(dji_sdk_MAINTAINER "iarc <iarc@todo.todo>")
+set(dji_sdk_DEPRECATED "")
+set(dji_sdk_VERSION "0.0.0")
+set(dji_sdk_BUILD_DEPENDS "std_msgs")
+set(dji_sdk_RUN_DEPENDS "std_msgs")
+set(dji_sdk_BUILDTOOL_DEPENDS "catkin")

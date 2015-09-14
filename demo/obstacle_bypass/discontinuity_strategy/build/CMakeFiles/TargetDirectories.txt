@@ -1,0 +1,17 @@
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/CMakeFiles/clean_test_results.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/dji_sdk_node.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/CMakeFiles/download_extra_data.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/CMakeFiles/doxygen.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/geometry_msgs_generate_messages_cpp.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/geometry_msgs_generate_messages_lisp.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/geometry_msgs_generate_messages_py.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/gtest/CMakeFiles/gtest.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/gtest/CMakeFiles/gtest_main.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/CMakeFiles/run_tests.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/sensor_msgs_generate_messages_cpp.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/sensor_msgs_generate_messages_lisp.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/sensor_msgs_generate_messages_py.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/std_msgs_generate_messages_cpp.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/std_msgs_generate_messages_lisp.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/dji_sdk/CMakeFiles/std_msgs_generate_messages_py.dir
+/home/dji/obstacle_avoidance/control/discontinuity-without_outliers-binary-multiframe/build/CMakeFiles/tests.dir
