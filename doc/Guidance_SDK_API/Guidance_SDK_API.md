@@ -1,11 +1,11 @@
 
-# Guidance SDK Documentation
+# Guidance SDK Reference
 
 *In case of any mistake or bug, please report to us using Github issue or DJI forum or email. You are welcome to send your pull request helping us fix issue. However, all pull requests related to document must follow the [document style](https://github.com/dji-sdk/Guidance-SDK/issues/3)*.
 
 ## Background
 
-This guide assumes that you have
+This document gives detailed explanation on the SDK structure and API functions. We assume that you have
 
 - a Guidance system,
 - a computer with OpenCV installed,
@@ -107,17 +107,19 @@ Data Field Explanation:
 
 Each of the supported data types is described below.
 
-- **Velocity Data:** velocity in body frame. The unit is **millimeter/second** and the frequency is 10 Hz.
+- [**Error Code**](#e_sdk_err_code) enumerates possible error codes. When error occurs, usually an error code will be given, and the developer can reference this enum to find the error type. 
 
-- **Obstacle Distance Data:** obstacle distance from five Guidance Sensors. The unit is **centimeter** and the frequency is 20 Hz.
+- [**Velocity Data:**](#velocity) velocity in body frame. The unit is **millimeter/second** and the frequency is 10 Hz.
 
-- **IMU Data:** IMU data including accelerometer (in unit of m/s^2) and gyroscope (in quaternion format) data. The frequency is 20 Hz.
+- [**Obstacle Distance Data:**](#obstacle_distance) obstacle distance from five Guidance Sensors. The unit is **centimeter** and the frequency is 20 Hz.
 
-- **Ultrasonic Data:** Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
+- [**IMU Data:**](#imu) IMU data including accelerometer (in unit of m/s^2) and gyroscope (in quaternion format) data. The frequency is 20 Hz.
 
-- **Greyscale Image:** Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
+- [**Ultrasonic Data:**](#ultrasonic_data) Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of meter) and reliability of the data. The frequency is 20 Hz.
 
-- **Depth Image:** Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.
+- [**Greyscale Image:**](#image_data) Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
+
+- [**Depth Image:**](#image_data) Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.
   
   **Notes:** In order to achieve best performance, it is suggested not performing any time-consuming processing in the callback function, but only copying the data out. Otherwise the transfer frequency might be slowed down. 
 
@@ -279,37 +281,31 @@ typedef struct _imu
 
 ### Overview
 
-The GUIDANCE API provides configuration and control methods for GUIDANCE with C interface.
+The GUIDANCE API provides configuration and control methods for GUIDANCE with C interface. Here is an overview of the key methods available in this API.
 
+- initialization
+[reset_config](#reset_config)
+[init_transfer](#init_transfer)
 
-Here is an overview of the key methods available in this API:
+- subscribe data
+[select_imu](#select_imu)
+[select_ultrasonic](#select_ultrasonic)
+[select_velocity](#select_velocity)
+[select_obstacle_distance ](#select_obstacle_distance )
+[set_image_frequecy](#set_image_frequecy)
+[select_depth_image](#select_depth_image)
+[select_greyscale_image](#select_greyscale_image)
 
-~~~ cpp
-// Guidance initialization
-SDK_API int reset_config( void );
-SDK_API int init_transfer( void );
+- set event
+[set_sdk_event_handler](#set_sdk_event_handler)
 
-// Guidance subscribe data
-SDK_API void select_imu( void );    
-SDK_API void select_ultrasonic( void );
-SDK_API void select_velocity( void );   
-SDK_API void select_obstacle_distance( void ); 
-SDK_API int set_image_frequecy( e_image_data_frequecy frequecy ); 
-SDK_API int select_depth_image( e_vbus_index camera_pair_index ); 
-SDK_API int select_greyscale_image( e_vbus_index camera_pair_index, bool is_left ); 
+- get status 
+[get_online_status](#get_online_status)
 
-// Guidance set event
-SDK_API int set_sdk_event_handler( user_call_back handler );
-
-// Guidance transfer control
-SDK_API int start_transfer( void );
-SDK_API int stop_transfer( void );
-SDK_API int release_transfer( void );
-
-// Guidance get status 
-SDK_API int get_online_status( int online_status[CAMERA_PAIR_NUM] );
-~~~
-
+- transfer control
+[start_transfer](#start_transfer)
+[stop_transfer](#stop_transfer)
+[release_transfer](#release_transfer)
 
 ### Method
 
