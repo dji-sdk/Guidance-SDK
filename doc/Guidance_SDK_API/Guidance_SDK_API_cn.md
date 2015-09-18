@@ -22,7 +22,7 @@
 ![](Images/Guidance_SDK_API3987.png)
 
 - **应用：**该层处理由HAL层传来的数据，由开发者编写。
-- ** HAL：**硬件抽象层。该层打包/解析从驱动层传来的数据，由示例代码实现（串口）SDK库（用于USB）实现，例如_libDJI \ _guidance.so_。
+- **HAL：**硬件抽象层。该层打包/解析从驱动层传来的数据，由示例代码实现（串口）SDK库（用于USB）实现，例如*libDJI_guidance.so*。
 - **驱动：**该层通过USB或者串口从Guidance接收数据，由操作系统或第三方库（如_libusb_）实现。
 
 ### 接口
