@@ -15,7 +15,9 @@ English version:
 
 　[Build a Visual Tracking Project](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_en.md)
 
-　[API Documentation](doc/Guidance_SDK_API/Guidance_SDK_API.md)
+　[API Documentation](doc/Guidance_SDK_API/Guidance_SDK_API_en.md)
+ 
+　[FAQ](doc/FAQ_en.md)
 
 
 中文版本：
@@ -24,7 +26,9 @@ English version:
 
 　[创建一个视觉跟踪工程](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_cn.md)
 
+　[API文档](doc/Guidance_SDK_API/Guidance_SDK_API_cn.md)
 
+　[FAQ](doc/FAQ_cn.md)
 
 Structure
 =========

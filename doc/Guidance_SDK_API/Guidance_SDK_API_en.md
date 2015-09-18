@@ -127,13 +127,13 @@ Each of the supported data types is described below.
 ~~~ cpp
 enum e_sdk_err_code
 {
-    e_sdk_no_err = 0,					// Succeed with no error.
-    e_load_libusb_err,					// Load libusb library error.
+    e_sdk_no_err = 0,					// Succeed with no error
+    e_load_libusb_err,					// Load libusb library error
     e_sdk_not_inited,					// SDK software is not ready 
     e_guidance_hardware_not_ready,		// Guidance hardware is not ready 
-    e_disparity_not_allowed,			// If work type is standard, disparity is not allowed to be selected 
+    e_disparity_not_allowed,			// Disparity or depth image is not allowed to be selected in standard mode
     e_image_frequency_not_allowed,		// Image frequency must be one of the enum type e_image_data_frequecy 
-    e_config_not_ready,					// Get config including the work type flag, before you can select data 
+    e_config_not_ready,					// Config is not ready. The SDK software reads configuration from Guidance Core when initialized. This error occurs when the initialization fails.
     e_online_flag_not_ready,			// Online flag is not ready 
     e_max_sdk_err = 100					// maximum number of errors
 };
@@ -142,17 +142,19 @@ enum e_sdk_err_code
 
 ### e\_vbus\_index
 
-**Description:** Define logical direction of vbus, i.e. the Guidance Sensor selected.
+**Description:** Define logical direction of vbus, i.e. the direction of selected Guidance Sensor. Note that they are only defined by the VBUS ports on Guidance Core, not by the Guidance Sensors.
+
+The comment of each element indicates the default direction when Guidance is installed on Matrice 100. However the developers can install Guidance in any manner on any device, thus the directions might also be different.
 
 
 ~~~ cpp
 enum e_vbus_index
 {
-    e_vbus1 = 1,        // logic direction of vbus
-    e_vbus2 = 2,        // logic direction of vbus
-    e_vbus3 = 3,        // logic direction of vbus
-    e_vbus4 = 4,        // logic direction of vbus
-    e_vbus5 = 0         // logic direction of vbus
+    e_vbus1 = 1,        // front on M100
+    e_vbus2 = 2,        // right on M100
+    e_vbus3 = 3,        // rear on M100
+    e_vbus4 = 4,        // left on M100
+    e_vbus5 = 0         // down on M100
 };
 ~~~
 
@@ -172,7 +174,7 @@ enum e_image_data_frequecy
 ### user\_callback
 
 - **Description:** Call back function prototype.
-- **Parameters:** `event_type` use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; `data_len` length of the input data; `data` input data read from GUIDANCE
+- **Parameters:** `event_type` use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; `data_len` length of the input data; `data` input data read from GUIDANCE.
 - **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
@@ -198,7 +200,7 @@ enum e_guidance_event
 
 ### image\_data
 
-**Description:** Define image data structure. The center of depth image coincides with the corresponding left greyscale image's.
+**Description:** Define image data structure. For each direction of stereo camera pair, the depth image aligns with the left greyscale image.
 
 ~~~ cpp
 typedef struct _image_data
@@ -213,7 +215,7 @@ typedef struct _image_data
 
 ### ultrasonic\_data
 
-**Description:** Define ultrasonic data structure. Unit is `mm`.
+**Description:** Define ultrasonic data structure. `ultrasonic` is the distance between Guidance Sensor and the nearest object detected by ultrasonic sensor. The Unit is `mm`. `reliability` is the reliability of this distance measurement, with 1 meaning reliable and 0 unreliable. 
 
 ~~~ cpp
 typedef struct _ultrasonic_data
@@ -227,7 +229,7 @@ typedef struct _ultrasonic_data
 
 ### velocity
 
-**Description:** Define velocity structure. Unit is `mm/s`.
+**Description:** Define velocity in body frame coordinate. Unit is `mm/s`.
 
 ~~~ cpp
 typedef struct _velocity
@@ -243,7 +245,7 @@ typedef struct _velocity
 
 ### obstacle\_distance
 
-**Description:** Define obstacle distance structure. Unit is `cm`.
+**Description:** Define obstacle distance calculated by fusing vision and ultrasonic sensors. Unit is `cm`.
 
 ~~~ cpp
 typedef struct _obstacle_distance
@@ -256,7 +258,7 @@ typedef struct _obstacle_distance
 
 ### imu
 
-**Description:** Define imu structure. Unit of acceleration is `m/s^2`.
+**Description:** Define imu. Unit of acceleration is `m/s^2`.
 
 ~~~ cpp
 typedef struct _imu
@@ -275,7 +277,7 @@ typedef struct _imu
 
 ### Overview
 
-The GUIDANCE API provides configuration and control methods for GUIDANCE with C interface. Here is an overview of the key methods available in this API.
+The Guidance API provides configuration and control methods for Guidance with C interface. Here is an overview of the key methods available in this API.
 
 - initialization
 	- [reset_config](#reset_config)
@@ -290,7 +292,7 @@ The GUIDANCE API provides configuration and control methods for GUIDANCE with C 
 	- [select_depth_image](#select_depth_image)
 	- [select_greyscale_image](#select_greyscale_image)
 
-- set event
+- set callback function handler
 	- [set_sdk_event_handler](#set_sdk_event_handler)
 
 - get status 
@@ -316,7 +318,7 @@ SDK_API int reset_config ( void );
 
 #### init\_transfer
 
-- **Description:** Initialize the GUIDANCE and connect it to PC.
+- **Description:** Initialize Guidance and create data transfer thread.
 - **Parameters:** NULL
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -346,7 +348,7 @@ SDK_API void select_ultrasonic ( void );
 
 #### select\_velocity
 
-- **Description:** Subscribe to velocity data, i.e. velocity of GUIDANCE in body coordinate system.
+- **Description:** Subscribe to velocity data, i.e. velocity of Guidance in body coordinate.
 - **Parameters:** NULL
 - **Return:** NULL
 
@@ -357,7 +359,7 @@ SDK_API void select_velocity ( void );
 
 #### select\_obstacle\_distance
 
-- **Description:** Subscribe to obstacle distance, i.e. distance from obstacle.
+- **Description:** Subscribe to obstacle distance data.
 - **Parameters:** NULL
 - **Return:** NULL
 
@@ -370,7 +372,7 @@ SDK_API void select_obstacle_distance ( void );
 #### set\_image\_frequecy
 
 - **Description:** Set frequency of image transfer.
-(**Note:** The bandwidth of USB is limited. If you subscribe too much images (greyscale image or depth image), the frequency should be relatively small, otherwise the SDK cannot guarantee the continuity of image transfer.)
+(**Note:** The bandwidth of USB is limited. If you subscribe too much images (greyscale image or depth image), the frequency should be set relatively small, otherwise the SDK cannot guarantee the continuity of image transfer.)
 - **Parameters:** `frequency` the frequency of image transfer
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -401,7 +403,7 @@ SDK_API int select_greyscale_image ( e_vbus_index camera_pair_index, bool is_lef
 
 #### set\_sdk\_event\_handler
 
-- **Description:** Set callback, when data from GUIDANCE comes, it will be called by transfer thread.
+- **Description:** Set callback function handler. When data from GUIDANCE comes, it will be called by transfer thread.
 - **Parameters:** `handler` pointer to callback function.
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -411,7 +413,7 @@ SDK_API int set_sdk_event_handler ( user_call_back handler );
 
 #### start\_transfer
 
-- **Description:** Send message to GUIDANCE to start data transfer.
+- **Description:** Inform Guidance to start data transfer.
 - **Parameters:** NULL .
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -421,7 +423,7 @@ SDK_API int start_transfer ( void );
 
 #### stop\_transfer
 
-- **Description:** Send message to GUIDANCE to stop data transfer.
+- **Description:** Inform Guidance to stop data transfer.
 - **Parameters:** NULL .
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -431,7 +433,7 @@ SDK_API int stop_transfer ( void );
 
 #### release\_transfer
 
-- **Description:** Release the data transfer thread.
+- **Description:** Release the data transfer thread. 
 - **Parameters:** NULL .
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -442,7 +444,7 @@ SDK_API int release_transfer ( void );
 #### get\_online\_status
 
 - **Description:** Get the online status of GUIDANCE sensors.
-- **Parameters:** `online\_status[CAMERA\_PAIR\_NUM]` online status of GUIDANCE sensors
+- **Parameters:** `online_status[CAMERA_PAIR_NUM]` online status of GUIDANCE sensors.
 - **Return:** `error code`. Non-zero if error occurs.
 
 ~~~ cpp
