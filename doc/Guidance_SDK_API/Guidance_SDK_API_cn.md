@@ -19,7 +19,7 @@
 
 本节介绍指导SDK的结构。该SDK分为三个层次：
 
-![](images/Guidance_SDK_API3987.png)
+![](Images/Guidance_SDK_API3987.png)
 
 - **应用：**该层处理由HAL层传来的数据，由开发者编写。
 - ** HAL：**硬件抽象层。该层打包/解析从驱动层传来的数据，由示例代码实现（串口）SDK库（用于USB）实现，例如_libDJI \ _guidance.so_。
@@ -27,7 +27,7 @@
 
 ### 接口
 
-Guidance SDK支持两种通信协议：USB和UART。
+Guidance SDK支持两种通信协议：USB和串口。
 
 #### 1. USB
 
@@ -45,7 +45,7 @@ Guidance SDK支持两种通信协议：USB和UART。
 
 **注：**可用带宽是受制于选择的图像数据和输出频率。订阅图像数据和输出频率的选择将被保存在Guidance系统上，并在Guidance下一次启动时生效。
 
-![](images/Guidance_SDK_API5146.png)
+![](Images/Guidance_SDK_API5146.png)
 
 2. Guidance API
 
@@ -58,7 +58,7 @@ Guidance SDK支持两种通信协议：USB和UART。
 
 串口的输出数据类型包括速度数据，障碍物距离数据，IMU数据和超声波数据。由于带宽限制，图像数据不通过UART输出。
 
-**注：**Guidance串口目前只支持** 115200 **波特率。
+**注：**Guidance串口目前只支持**115200**波特率。
 
 1.订阅数据
 
@@ -114,7 +114,6 @@ Guidance SDK支持两种通信协议：USB和UART。
 - [**灰度图像：**](#image_data) 输出五个方向的8比特灰度图像。每张图像分辨率为320\*240. 默认频率为20Hz，可以通过API​​函数降频。
 - [**深度图像**](#image_data) 输出五个方向的16比特深度图像。每张图像分辨率为320\*240. 默认频率为20Hz，可以通过API​​函数降频。
   
- **注：**为了达到最佳性能，建议在回调函数中不执行任何耗时的处理，只复制数据。否则，传输频率可能会有所降低。
 
 ## 数据结构
 
@@ -157,7 +156,7 @@ enum e_vbus_index
 
 ### e\_image\_data\_frequecy
 
-**描述：**定义图像数据的频率。
+**描述：**定义图像数据的频率。可选的频率有：5Hz, 10Hz, 20Hz. 订阅的图像越多，传输的频率就越低。
 
 ~~~ cpp
 enum e_image_data_frequecy
@@ -170,7 +169,7 @@ enum e_image_data_frequecy
 
 ### user\_callback
 
-- **描述：**回调函数的原型。
+- **描述：**回调函数的原型。 开发者的回调函数必须按照该原型编写。为了达到最佳性能，建议在回调函数中不执行任何耗时的处理，只复制数据。否则，传输频率可能会有所降低。
 - **参数：**`event_type`使用它来识别数据类型：图像，IMU，超声波，速度或障碍物距离;`data_len`输入数据的长度; `data`从Guidance输入的数据。
 - **返回：**`错误码`。如果发生错误为非零。
 
@@ -274,8 +273,9 @@ typedef struct _imu
 
 ### 概述
 
-The GUIDANCE API provides configuration and control methods for GUIDANCE with C interface. Here is an overview of the key methods available in this API.
-Guidance API提供了配置和控制Guidance的C接口。下面是该API提供的关键方法的概览。
+对USB接口，Guidance API提供了配置和控制Guidance的C接口。下面是该API提供的关键方法的概览。
+
+当使用UART传输时请参考第2.​​1.2节的协议，以及`uart_example`示例代码。
 
 - 初始化
 	- [reset_config](#reset_config)
@@ -389,9 +389,6 @@ SDK_API void select_depth_image ( e_vbus_index camera_pair_index );
 
 #### select\_greyscale\_image
 
-- **Description:** Subscribe to rectified grey image data.
-- **Parameters:** `camera_pair_index` index of camera pair selected; `is_left` whether the image data selected is left.
-- **Return:** `error code`. Non-zero if error occurs.
 - **描述：**订阅纠正灰度图像数据。
 - **参数：**`camera_pair_index` 选择的摄像机对索引; `is_left`是否选择左边的图像：为`true`时选择左图，为`false`时选择右图。
 - **返回：**`错误码`。如果发生错误则非零。
@@ -402,9 +399,6 @@ SDK_API int select_greyscale_image ( e_vbus_index camera_pair_index, bool is_lef
 
 #### set\_sdk\_event\_handler
 
-- **Description:** Set callback, when data from GUIDANCE comes, it will be called by transfer thread.
-- **Parameters:** `handler` pointer to callback function.
-- **Return:** `error code`. Non-zero if error occurs.
 - **描述：**设置回调函数指针。当有数据从Guidance传过来时，回调函数将被传输线程调用。
 - **参数：**`handler` 回调函数指针。
 - **返回：**`错误码`。如果发生错误则非零。
@@ -452,5 +446,3 @@ SDK_API int release_transfer ( void );
 ~~~ cpp
 SDK_API int get_online_status (int online_status[CAMERA_PAIR_NUM] );
 ~~~
-
-**注**：以上说明仅用于USB传输类型。当使用UART传输时请参考第2.​​1.2节的协议，以及`uart_example`示例代码。

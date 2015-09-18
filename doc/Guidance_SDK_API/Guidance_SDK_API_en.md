@@ -113,9 +113,7 @@ Each of the supported data types is described below.
 - [**IMU Data:**](#imu) IMU data including accelerometer (in unit of **m/s^2**) and gyroscope (in quaternion format and in unit of **radian**) data. The frequency is 20 Hz.
 - [**Ultrasonic Data:**](#ultrasonic_data) Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of **meter**) and reliability of the data. The frequency is 20 Hz.
 - [**Greyscale Image:**](#image_data) Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
-- [**Depth Image:**](#image_data) Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.
-  
-  **Notes:** In order to achieve best performance, it is suggested not performing any time-consuming processing in the callback function, but only copying the data out. Otherwise the transfer frequency might be slowed down. 
+- [**Depth Image:**](#image_data) Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.  
 
 
 ## Data Structures
@@ -160,7 +158,7 @@ enum e_vbus_index
 
 ### e\_image\_data\_frequecy
 
-**Description:** Define frequency of image data.
+**Description:** Define frequency of image data. The supported frequencies are: 5Hz, 10Hz, 20Hz. With more images selected, smaller frequency should be selected.
 
 ~~~ cpp
 enum e_image_data_frequecy
@@ -173,7 +171,7 @@ enum e_image_data_frequecy
 
 ### user\_callback
 
-- **Description:** Call back function prototype.
+- **Description:** Callback function prototype. The developer must write his/her own callback function in this form. In order to achieve best performance, it is suggested not performing any time-consuming processing in the callback function, but only copying the data out. Otherwise the transfer frequency might be slowed down. 
 - **Parameters:** `event_type` use it to identify the data type: image, imu, ultrasonic, velocity or obstacle distance; `data_len` length of the input data; `data` input data read from GUIDANCE.
 - **Return:** `error code`. Non-zero if error occurs.
 
@@ -278,6 +276,8 @@ typedef struct _imu
 ### Overview
 
 The Guidance API provides configuration and control methods for Guidance with C interface. Here is an overview of the key methods available in this API.
+
+Please reference the protocol of Section 2.1.2 and also the example code of `uart_example` when using UART transfer type.
 
 - initialization
 	- [reset_config](#reset_config)
@@ -450,5 +450,3 @@ SDK_API int release_transfer ( void );
 ~~~ cpp
 SDK_API int get_online_status (int online_status[CAMERA_PAIR_NUM] );
 ~~~
-
-**Notes** : These are only used for USB transfer type. Please reference the protocol of Section 2.1.2 and also the example code of `uart_example` when using UART transfer type.
