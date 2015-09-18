@@ -43,6 +43,7 @@ Guidance SDK支持两种通信协议：USB和串口。
 	- 根据您的需求选择数据
 
 	**注：**可用带宽是受制于选择的图像数据和输出频率。订阅图像数据和输出频率的选择将被保存在Guidance系统上，并在Guidance下一次启动时生效。
+
 	![](Images/Guidance_SDK_API5146.png)
 2. Guidance API
 	用户可以通过Guidance API订阅数据，这些API函数的名字都以"select"开头。
