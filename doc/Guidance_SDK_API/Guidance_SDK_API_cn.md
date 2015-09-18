@@ -36,22 +36,18 @@ Guidance SDK支持两种通信协议：USB和串口。
 有两种方法可以通过USB订阅数据。
 
 1. Guidance Assist软件
+	用户可以使用Guidance Assist软件中的“DIY-> API - > USB”选项卡来订阅数据。
 
-用户可以使用Guidance Assist软件中的“DIY-> API - > USB”选项卡来订阅数据。
+	- 使用USB线连接Guidance和PC，将Guidance上电
+	- 选择“启用”复选框
+	- 根据您的需求选择数据
 
-- 使用USB线连接Guidance和PC，将Guidance上电
-- 选择“启用”复选框
-- 根据您的需求选择数据
-
-**注：**可用带宽是受制于选择的图像数据和输出频率。订阅图像数据和输出频率的选择将被保存在Guidance系统上，并在Guidance下一次启动时生效。
-
-![](Images/Guidance_SDK_API5146.png)
-
+	**注：**可用带宽是受制于选择的图像数据和输出频率。订阅图像数据和输出频率的选择将被保存在Guidance系统上，并在Guidance下一次启动时生效。
+	![](Images/Guidance_SDK_API5146.png)
 2. Guidance API
+	用户可以通过Guidance API订阅数据，这些API函数的名字都以"select"开头。
 
-用户可以通过Guidance API订阅数据，这些API函数的名字都以"select"开头。
-
-**注：**如果用户通过Guidance API函数来订阅图像数据和输出频率，它只会在Guidance上电期间临时生效，Guidance断电后将恢复到Guidance Assist设置的状态。
+	**注：**如果用户通过Guidance API函数来订阅图像数据和输出频率，它只会在Guidance上电期间临时生效，Guidance断电后将恢复到Guidance Assist设置的状态。
 
 
 #### 2. 串口
@@ -60,14 +56,14 @@ Guidance SDK支持两种通信协议：USB和串口。
 
 **注：**Guidance串口目前只支持**115200**波特率。
 
-1.订阅数据
+1. 订阅数据
 
-您只能使用Guidance Assist软件订阅UART数据。从“DIY-> API - > UART”页面启用串口。与USB相同，该配置将被保存在Guidance系统上，除非你在“UART”选项卡中取消选择“启用”选项。
+	您只能使用Guidance Assist软件订阅UART数据。从“DIY-> API - > UART”页面启用串口。与USB相同，该配置将被保存在Guidance系统上，除非你在“UART”选项卡中取消选择“启用”选项。
 	![](Images/Guidance_SDK_API6086.png)
 
 2. 协议说明
 
-协议帧格式：
+	协议帧格式：
 
 | SOF | LEN | VER | RES | SEQ | CRC16 | DATA | CRC32 |
 | --- | --- | --- | --- | --- | --- | --- | --- |

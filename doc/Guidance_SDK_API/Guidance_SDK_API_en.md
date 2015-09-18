@@ -68,7 +68,7 @@ The output data types of UART are Velocity Data, Obstacle Distance Data, IMU Dat
 
 2. Protocol Description
 
-Protocol Frame Format:
+	Protocol Frame Format:
 
 | SOF | LEN | VER | RES | SEQ | CRC16 | DATA | CRC32 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
