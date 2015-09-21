@@ -131,14 +131,14 @@ For example:
 
 - When using the USB port of Guidance SDK, `sudo` command is required to get root privilege of USB port, otherwise an error of *permission denied* will occur. For example:
 
-
 		>> sudo ./guidance_example
 
 
 - To save the trouble of using `sudo` every time you run Guidance SDK programs, you can also create a file `51-guidance.rules` in `/etc/udev/rules.d/` with the following content:
 
 		SUBSYSTEM=="usb", ATTR{idVendor}=="fff0", ATTR{idProduct}=="d009", MODE="0666"
-Then disconnect and connect again USB cable of Guidance Core. Now you will be able to run Guidance SDK programs without `sudo`.
+
+	Then disconnect and connect again USB cable of Guidance Core. Now you will be able to run Guidance SDK programs without `sudo`.
 
 ## Common Errors
 
@@ -170,9 +170,7 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 
 ***Description:***
 
-
-	Error while loading shared libraries : libDJI_guidance.so: cannot open shared object file : No such file or directory.
-
+> Error while loading shared libraries : libDJI_guidance.so: cannot open shared object file : No such file or directory.
 
 ***Solution:***
 
@@ -183,8 +181,7 @@ Then disconnect and connect again USB cable of Guidance Core. Now you will be ab
 
 ***Description:***
 
-
-	Cannot open DJI_guidance.dll file:No such file or directory.
+> Cannot open DJI_guidance.dll file:No such file or directory.
 
 
 ***Solution:*** 
@@ -194,7 +191,7 @@ Make sure that corresponding **DJI\_guidance.dll** is placed in the RUNPATH.
 
 ***Description:***
 
-	Cannot open OpenCV related *.h or *.dll.
+> Cannot open OpenCV related *.h or *.dll.
 
 ***Solution:***
 

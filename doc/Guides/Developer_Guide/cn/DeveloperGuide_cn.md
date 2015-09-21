@@ -117,11 +117,13 @@ Linux默认包含了UART驱动，不需要另外安装。
 - 使用Guidance的USB接口时，需要使用`sudo`指令，以取得对USB接口的root权限。否则会出现*permission denied*的错误。
 例如:
 
-	> sudo ./guidance_example
+		>> sudo ./guidance_example
+
 - 为了避免每次都要使用sudo来运行Guidance SDK程序的麻烦，可以在`/etc/udev/rules.d/`文件夹中创建一个规则文件`51-guidance.rules`，内容如下：
 		
-	SUBSYSTEM=="usb", ATTR{idVendor}=="fff0", ATTR{idProduct}=="d009", MODE="0666"
-然后再拨插USB线，就可以以普通用户的权限来运行Guidance SDK程序了。
+		SUBSYSTEM=="usb", ATTR{idVendor}=="fff0", ATTR{idProduct}=="d009", MODE="0666"
+
+	然后再拨插USB线，就可以以普通用户的权限来运行Guidance SDK程序了。
  
 ## 常见错误
 
@@ -156,7 +158,7 @@ Linux默认包含了UART驱动，不需要另外安装。
 
 ***错误描述:***
 
-	Error while loading shared libraries : libDJI_guidance.so: cannot open shared object file : No such file or directory.
+> Error while loading shared libraries : libDJI_guidance.so: cannot open shared object file : No such file or directory.
 
 	
 ***解决方法:***
@@ -168,7 +170,7 @@ Linux默认包含了UART驱动，不需要另外安装。
 
 ***错误描述:***
 
-	Cannot open DJI_guidance.dll file:No such file or directory.
+> Cannot open DJI_guidance.dll file:No such file or directory.
 
     
 ***解决方法:***
@@ -180,7 +182,7 @@ Linux默认包含了UART驱动，不需要另外安装。
 
 ***错误描述:***
 
-无法打开与OpenCV有关的**\*.h**与**\*.dll**等文件；
+> 无法打开与OpenCV有关的**\*.h**与**\*.dll**等文件；
 
 ***解决办法:***
 
