@@ -144,9 +144,9 @@ typedef struct _imu
 {
 	unsigned int     frame_index;	          /**< corresponse frame index */
 	unsigned int     time_stamp;	          /**< time stamp of corresponse image captured in ms */
-	float            acc_x;	                  /**< acceleration of x m/s^2 */
-	float            acc_y;	                  /**< acceleration of y m/s^2 */
-	float            acc_z;	                  /**< acceleration of z m/s^2 */
+	float            acc_x;	                  /**< acceleration of x in unit of g*/
+	float            acc_y;	                  /**< acceleration of y in unit of g */
+	float            acc_z;	                  /**< acceleration of z in unit of g */
 
 	float            q[4];	                  /**< attitude data */
 }imu;

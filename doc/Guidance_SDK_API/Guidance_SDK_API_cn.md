@@ -106,7 +106,7 @@ Guidance SDK支持两种通信协议：USB和串口。
 - [**错误码：**](#e_sdk_err_code) 列举可能的错误代码。当错误发生时，通常会返回一个错误码，而开发者可以参考此枚举来检查错误类型。
 - [**速度数据：**](#velocity) 机体坐标下的速度。单位是**毫米每秒**，频率是10 Hz.
 - [**障碍物距离数据:**](#obstacle_distance) 从五个Guidance传感器模块读取的障碍物距离数据。单位是**厘米**，频率是20 Hz.
-- [**IMU数据：**](#imu) IMU数据，包括加速度计（单位为**m/s^2**）和陀螺仪（四元数格式，单位**弧度**）数据。频率为20 Hz.
+- [**IMU数据：**](#imu) IMU数据，包括加速度计（单位为重力加速度**g**）和陀螺仪（四元数格式）数据。频率为20 Hz.
 - [**超声波数据：**](#ultrasonic_data) 输出从五个Guidance传感器读取的超声波数据，包括障碍物距离（单位为**米**）和数据的可靠性。频率为20 Hz.
 - [**灰度图像：**](#image_data) 输出五个方向的8比特灰度图像。每张图像分辨率为320\*240. 默认频率为20Hz，可以通过API​​函数降频。
 - [**深度图像**](#image_data) 输出五个方向的16比特深度图像。每张图像分辨率为320\*240. 默认频率为20Hz，可以通过API​​函数降频。
@@ -251,16 +251,16 @@ typedef struct _obstacle_distance
 
 ### imu
 
-**描述：**定义IMU。加速度单位为`m/s^2`。
+**描述：**定义IMU。加速度单位为重力加速度g。
 
 ~~~ cpp
 typedef struct _imu
 {
     unsigned int     frame_index;             // corresponse frame index 
     unsigned int     time_stamp;              // time stamp of corresponse image captured in ms 
-    float            acc_x;                   // acceleration of x m/s^2
-    float            acc_y;                   // acceleration of y m/s^2
-    float            acc_z;                   // acceleration of z m/s^2
+    float            acc_x;                   // acceleration of x in unit of g
+    float            acc_y;                   // acceleration of y in unit of g
+    float            acc_z;                   // acceleration of z in unit of g
     float            q[4];                    // quaternion: [w,x,y,z]
 }imu;
 ~~~

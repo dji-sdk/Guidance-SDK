@@ -110,7 +110,7 @@ Each of the supported data types is described below.
 - [**Error Code**](#e_sdk_err_code) enumerates possible error codes. When error occurs, usually an error code will be given, and the developer can reference this enum to find the error type. 
 - [**Velocity Data:**](#velocity) velocity in body frame. The unit is **millimeter/second** and the frequency is 10 Hz.
 - [**Obstacle Distance Data:**](#obstacle_distance) obstacle distance from five Guidance Sensors. The unit is **centimeter** and the frequency is 20 Hz.
-- [**IMU Data:**](#imu) IMU data including accelerometer (in unit of **m/s^2**) and gyroscope (in quaternion format and in unit of **radian**) data. The frequency is 20 Hz.
+- [**IMU Data:**](#imu) IMU data including accelerometer (in unit of acceleration of gravity **g**) and gyroscope (in quaternion format) data. The frequency is 20 Hz.
 - [**Ultrasonic Data:**](#ultrasonic_data) Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of **meter**) and reliability of the data. The frequency is 20 Hz.
 - [**Greyscale Image:**](#image_data) Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
 - [**Depth Image:**](#image_data) Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.  
@@ -256,16 +256,16 @@ typedef struct _obstacle_distance
 
 ### imu
 
-**Description:** Define imu. Unit of acceleration is `m/s^2`.
+**Description:** Define imu. Unit of acceleration is acceleration of gravity `g`.
 
 ~~~ cpp
 typedef struct _imu
 {
     unsigned int     frame_index;             // corresponse frame index 
     unsigned int     time_stamp;              // time stamp of corresponse image captured in ms 
-    float            acc_x;                   // acceleration of x m/s^2
-    float            acc_y;                   // acceleration of y m/s^2
-    float            acc_z;                   // acceleration of z m/s^2
+    float            acc_x;                   // acceleration of x in unit of g
+    float            acc_y;                   // acceleration of y in unit of g
+    float            acc_z;                   // acceleration of z in unit of g
     float            q[4];                    // quaternion: [w,x,y,z]
 }imu;
 ~~~
