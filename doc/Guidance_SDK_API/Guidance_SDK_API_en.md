@@ -194,12 +194,12 @@ enum e_guidance_event
 ~~~ cpp
 typedef struct _image_data
 {
-	unsigned int     frame_index;	                                  // frame index 
-	unsigned int     time_stamp;	                                  // time stamp of image captured in ms 
-	char             *m_greyscale_image_left[CAMERA_PAIR_NUM];	      // greyscale image of left camera 
-	char             *m_greyscale_image_right[CAMERA_PAIR_NUM];   	  // greyscale image of right camera 
-	char             *m_depth_image[CAMERA_PAIR_NUM];	              // depth image in meters 
-	char             *m_disparity_image[CAMERA_PAIR_NUM];             // disparity image in pixels 
+	unsigned int     frame_index;	                              // frame index 
+	unsigned int     time_stamp;	                              // time stamp of image captured in ms 
+	char             *m_greyscale_image_left[CAMERA_PAIR_NUM];	  // greyscale image of left camera 
+	char             *m_greyscale_image_right[CAMERA_PAIR_NUM];   // greyscale image of right camera 
+	char             *m_depth_image[CAMERA_PAIR_NUM];	          // depth image in meters 
+	char             *m_disparity_image[CAMERA_PAIR_NUM];         // disparity image in pixels 
 }image_data;
 ~~~ 
 
@@ -210,10 +210,10 @@ typedef struct _image_data
 ~~~ cpp
 typedef struct _ultrasonic_data
 {
-	unsigned int     frame_index;	                        // correspondent frame index 
-	unsigned int     time_stamp;	                        // time stamp of correspondent image captured in ms 
-	short            ultrasonic[CAMERA_PAIR_NUM];	        // distance in mm. -1 means invalid measurement. 
-	unsigned short   reliability[CAMERA_PAIR_NUM];	        // reliability of the distance data 
+	unsigned int     frame_index;	                  // correspondent frame index 
+	unsigned int     time_stamp;	                  // time stamp of correspondent image captured in ms 
+	short            ultrasonic[CAMERA_PAIR_NUM];	  // distance in mm. -1 means invalid. 
+	unsigned short   reliability[CAMERA_PAIR_NUM];	  // reliability of the distance data 
 }ultrasonic_data;
 ~~~ 
 
@@ -239,9 +239,9 @@ typedef struct _velocity
 ~~~ cpp
 typedef struct _obstacle_distance
 {
-	unsigned int     frame_index;	                // correspondent frame index 
-	unsigned int     time_stamp;	                // time stamp of correspondent image captured in ms 
-	unsigned short   distance[CAMERA_PAIR_NUM];     // distance of obstacle in cm 
+	unsigned int     frame_index;	             // correspondent frame index 
+	unsigned int     time_stamp;	             // time stamp of correspondent image captured in ms 
+	unsigned short   distance[CAMERA_PAIR_NUM];  // distance of obstacle in cm 
 }obstacle_distance;
 ~~~ 
 
