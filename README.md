@@ -1,12 +1,11 @@
 # DJI Guidance SDK
 
-
-Official Guidance SDK package for accessing the rich categories of output data from Guidance via USB and UART, and configure your Guidance all by your demand.
-
 　[English Version](#english-version)
 　[中文版本](#中文版本)
 
 ## English Version
+Official Guidance SDK package for accessing the rich categories of output data from Guidance via USB and UART, and configure your Guidance all by your demand.
+
 ### Document
 
 　[Developer Guide](doc/Guides/Developer_Guide/en/DeveloperGuide_en.md)
@@ -69,7 +68,7 @@ Guidance SDK可以让开发者通过Guidance的USB口和串口来获取丰富的
 请注意，为了便于ROS用户的快速下载，我们还维护了一个独立的ROS包。它不包含任何文档和Windows下的库文件，因此具有更小的体积：[Guidance-SDK-ROS](https://github.com/dji-sdk/Guidance-SDK-ROS).
 
 ### 如何使用
-### Windows 
+#### Windows 
 
 USB和串口的示例代码可以在 *examples/usb\_example* 和 *examples/uart\_example*中找到，其中包含了可直接编译运行的Visual Studio工程。需要将对应的dll文件复制到exe所在目录或Windows系统目录。
 
