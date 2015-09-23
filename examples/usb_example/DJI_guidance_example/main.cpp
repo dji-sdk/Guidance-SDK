@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <iostream>
 #include "DJI_guidance.h"
 #include "DJI_utility.h"
 
@@ -21,13 +22,10 @@ using namespace std;
 
 #ifdef HAVE_OPENCV
 using namespace cv;
-Mat     g_greyscale_image_left(HEIGHT, WIDTH, CV_8UC1);
-Mat		g_greyscale_image_right(HEIGHT, WIDTH, CV_8UC1);
-Mat		g_depth(HEIGHT,WIDTH,CV_16SC1);
-#else
-char    g_greyscale_image_left[IMAGE_SIZE];
-char	g_greyscale_image_right[IMAGE_SIZE];
-char    g_depth[IMAGE_SIZE * 2];
+Mat     g_greyscale_image_left[CAMERA_PAIR_NUM];
+Mat		g_greyscale_image_right[CAMERA_PAIR_NUM];
+Mat		g_depth[CAMERA_PAIR_NUM];//(HEIGHT,WIDTH,CV_16SC1);
+Mat		g_disparity[CAMERA_PAIR_NUM];//(HEIGHT,WIDTH,CV_16SC1);
 #endif
 e_vbus_index sensor_id = e_vbus1;
 
@@ -35,63 +33,62 @@ DJI_lock    g_lock;
 DJI_event   g_event;
 char		key = 0;
 
+std::ostream& operator<<(std::ostream& out, const e_sdk_err_code value){
+	const char* s = 0;
+	static char str[100]={0};
+#define PROCESS_VAL(p) case(p): s = #p; break;
+	switch(value){
+		PROCESS_VAL(e_OK);     
+		PROCESS_VAL(e_load_libusb_err);     
+		PROCESS_VAL(e_sdk_not_inited);
+		PROCESS_VAL(e_disparity_not_allowed);
+		PROCESS_VAL(e_image_frequency_not_allowed);
+		PROCESS_VAL(e_config_not_ready);
+		PROCESS_VAL(e_online_flag_not_ready);
+		PROCESS_VAL(e_libusb_io_err);
+		PROCESS_VAL(e_stereo_cali_not_ready);
+	case(e_timeout):
+		strcpy(str, "Timout during transfer");
+		s = str;
+		break;
+	default:
+		strcpy(str, "Unknown error");
+		s = str;
+		break;
+	}
+#undef PROCESS_VAL
+
+	return out << s;
+}
+
 int my_callback(int data_type, int data_len, char *content)
 {
 	g_lock.enter();
 	if (e_image == data_type && NULL != content)
 	{
-		image_data data;
-		memcpy( (char*)&data, content, sizeof(data) );
-		printf( "frame index:%d,stamp:%d\n", data.frame_index, data.time_stamp );
-#if !USE_GUIDANCE_ASSISTANT_CONFIG
+		image_data* data = (image_data* )content;
+		printf( "frame index:%d,stamp:%d\n", data->frame_index, data->time_stamp );
 #ifdef HAVE_OPENCV
-		memcpy( g_greyscale_image_left.data, data.m_greyscale_image_left[sensor_id], IMAGE_SIZE );
-		memcpy( g_greyscale_image_right.data, data.m_greyscale_image_right[sensor_id], IMAGE_SIZE );
-        memcpy( g_depth.data, data.m_depth_image[sensor_id], IMAGE_SIZE * 2 );
-		imshow("left", g_greyscale_image_left);
-		imshow("right", g_greyscale_image_right);
-#endif
-#else
 		for ( int d = 0; d < CAMERA_PAIR_NUM; ++d )
 		{
-			string stmps;
-			if ( data.m_greyscale_image_left[d] )
-			{
-#ifdef HAVE_OPENCV
-				memcpy( g_greyscale_image_left.data, data.m_greyscale_image_left[d], IMAGE_SIZE );//maybe select too many image so just overwrite it
-				stmps = "left";
-				stmps = stmps + (char)('0'+d);
-				imshow(stmps.c_str(), g_greyscale_image_left);
-#endif
-			}
-			if ( data.m_greyscale_image_right[d] )
-			{
-#ifdef HAVE_OPENCV
-				memcpy( g_greyscale_image_right.data, data.m_greyscale_image_right[d], IMAGE_SIZE );
-				stmps = "right";
-				stmps = stmps + (char)('0'+d);
-				imshow(stmps, g_greyscale_image_right);
-#endif
-			}
-			if ( data.m_depth_image[d] )
-			{
-#ifdef HAVE_OPENCV
-				Mat depthmap(HEIGHT, WIDTH, CV_16SC1);
-				Mat depthmap8(HEIGHT, WIDTH, CV_8UC1);
-				memcpy( depthmap.data, data.m_depth_image[d], IMAGE_SIZE * 2 );
-				depthmap.convertTo(depthmap8, CV_8UC1);
-				stmps = "depthmap";
-				stmps = stmps + (char)('0'+d);
-				imshow(stmps, depthmap8);
-#endif
-			}
+			if ( data->m_greyscale_image_left[d] ){
+				g_greyscale_image_left[d] = Mat::zeros(HEIGHT,WIDTH,CV_8UC1);
+				memcpy( g_greyscale_image_left[d].data, data->m_greyscale_image_left[d], IMAGE_SIZE );
+			}else g_greyscale_image_left[d].release();
+			if ( data->m_greyscale_image_right[d] ){
+				g_greyscale_image_right[d] = Mat::zeros(HEIGHT,WIDTH,CV_8UC1);
+				memcpy( g_greyscale_image_right[d].data, data->m_greyscale_image_right[d], IMAGE_SIZE );
+			}else g_greyscale_image_right[d].release();
+			if ( data->m_depth_image[d] ){
+				g_depth[d] = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
+				memcpy( g_depth[d].data, data->m_depth_image[d], IMAGE_SIZE * 2 );
+			}else g_depth[d].release();
+			if ( data->m_disparity_image[d] ){
+				g_disparity[d] = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
+				memcpy( g_disparity[d].data, data->m_disparity_image[d], IMAGE_SIZE * 2 );
+			}else g_disparity[d].release();
 		}
 #endif
-
-#ifdef HAVE_OPENCV
-		key = waitKey(1);
-#endif
-
 	}
 
 	if ( e_imu == data_type && NULL != content )
@@ -113,9 +110,8 @@ int my_callback(int data_type, int data_len, char *content)
 		obstacle_distance *oa = (obstacle_distance*)content;
 		printf( "obstacle distance:" );
 		for ( int i = 0; i < CAMERA_PAIR_NUM; ++i )
-		{
 			printf( " %f ", 0.01f * oa->distance[i] );
-		}
+		
 		printf( "\n" );
 		printf( "frame index:%d,stamp:%d\n", oa->frame_index, oa->time_stamp );
 	}
@@ -124,9 +120,8 @@ int my_callback(int data_type, int data_len, char *content)
 	{
 		ultrasonic_data *ultrasonic = (ultrasonic_data*)content;
 		for ( int d = 0; d < CAMERA_PAIR_NUM; ++d )
-		{
 			printf( "ultrasonic distance:%f,reliability:%d\n", ultrasonic->ultrasonic[d] * 0.001f, (int)ultrasonic->reliability[d] );
-		}
+		
 		printf( "frame index:%d,stamp:%d\n", ultrasonic->frame_index, ultrasonic->time_stamp );
 	}
 
@@ -136,27 +131,56 @@ int my_callback(int data_type, int data_len, char *content)
 	return 0;
 }
 
-#define RETURN_IF_ERR(err_code) { if( err_code ){ release_transfer(); printf( "error code:%d,%s %d\n", err_code, __FILE__, __LINE__ ); return -1;}}
+#define RETURN_IF_ERR(err_code) { if( err_code ){ release_transfer(); \
+std::cout<<"Error: "<<err_code<<" at "<<__LINE__<<","<<__FILE__<<std::endl; return -1;}}
 
 int main(int argc, const char** argv)
 {
 	if(argc>1){
 		printf("This is demo program showing data from Guidance.\n\t" 
-			"Type 'a','d','w','s','x' to select sensor direction.\n\t"
-			"Type 'q' to quit.");
+			" 'a','d','w','s','x' to select sensor direction.\n\t"
+			" 'j','k' to change the exposure parameters.\n\t"
+			" 'm' to switch between AEC and constant exposure modes.\n\t"
+			" 'n' to return to default exposure mode and parameters.\n\t"
+			" 'q' to quit.");
 		return 0;
 	}
 
-	reset_config();
-	int err_code = init_transfer();
+	reset_config();  // clear all data subscription
+
+	int err_code = init_transfer(); //wait for board ready and init transfer thread
 	RETURN_IF_ERR( err_code );
+
+	int online_status[CAMERA_PAIR_NUM];
+	err_code = get_online_status(online_status);
+	RETURN_IF_ERR(err_code);
+	cout<<"Sensor online status: ";
+	for (int i=0; i<CAMERA_PAIR_NUM; i++)
+		cout<<online_status[i]<<" ";
+	cout<<endl;
+
+	// get cali param
+	stereo_cali cali[CAMERA_PAIR_NUM];
+	err_code = get_stereo_cali(cali);
+	RETURN_IF_ERR(err_code);
+	cout<<"cu\tcv\tfocal\tbaseline\n";
+	for (int i=0; i<CAMERA_PAIR_NUM; i++)
+	{
+		cout<<cali[i].cu<<"\t"<<cali[i].cv<<"\t"<<cali[i].focal<<"\t"<<cali[i].baseline<<endl;
+	}
 
 #if !USE_GUIDANCE_ASSISTANT_CONFIG
 	err_code = select_greyscale_image( sensor_id, true );
 	RETURN_IF_ERR( err_code );
 	err_code = select_greyscale_image( sensor_id, false );
 	RETURN_IF_ERR( err_code );
+	err_code = select_greyscale_image( e_vbus2, true );
+	RETURN_IF_ERR( err_code );
+	err_code = select_greyscale_image( e_vbus2, false );
+	RETURN_IF_ERR( err_code );
 	err_code = select_depth_image( sensor_id );
+	RETURN_IF_ERR( err_code );
+	err_code = select_disparity_image( sensor_id );
 	RETURN_IF_ERR( err_code );
 	select_imu();
 	select_ultrasonic();
@@ -169,30 +193,81 @@ int main(int argc, const char** argv)
 	err_code = start_transfer();
 	RETURN_IF_ERR( err_code );
 
-	// loop for 1000 iterations, i.e. 50 seconds when frequency is 20Hz
-	for ( int j = 0; j < 1000; ++j )
+	// for setting exposure
+	exposure_param para;
+	para.m_is_auto_exposure = 1;
+	para.m_step = 10;
+	para.m_expected_brightness = 120;
+	para.m_camera_pair_index = sensor_id;
+
+	while(1)
 	{
 		g_event.wait_event();
-		if (key != 0)
-		{
-			err_code = stop_transfer();
-			RETURN_IF_ERR(err_code);
-			reset_config();
+#ifdef HAVE_OPENCV
+		for(int d=0;d<CAMERA_PAIR_NUM;d++){
+			if(!g_greyscale_image_left[d].empty())
+				imshow(string("left_")+char('0'+d), g_greyscale_image_left[d]);
+			if(!g_greyscale_image_right[d].empty())
+				imshow(string("right_")+char('0'+d), g_greyscale_image_right[d]);
 
-			if (key == 'q') break;
-			if (key == 'w') sensor_id = e_vbus1;
-			if (key == 'd') sensor_id = e_vbus2;
-			if (key == 'x') sensor_id = e_vbus3;
-			if (key == 'a') sensor_id = e_vbus4;	   
-			if (key == 's') sensor_id = e_vbus5;
-
-			select_greyscale_image(sensor_id, true);
-			select_greyscale_image(sensor_id, false);
-			select_depth_image(sensor_id);
-
-			err_code = start_transfer();
-			RETURN_IF_ERR(err_code);
+			if(!g_depth[d].empty()){
+				Mat depth8(HEIGHT,WIDTH,CV_8UC1);
+				g_depth[d].convertTo(depth8, CV_8UC1);
+				imshow(string("depth_")+char('0'+d), depth8);
+			}
+			if(!g_disparity[d].empty()){
+				Mat disp8(HEIGHT,WIDTH, CV_8UC1);
+				g_disparity[d].convertTo(disp8, CV_8UC1);
+				imshow(string("disparity_")+char('0'+d), disp8);
+			}
 		}
+		key = waitKey(1);
+#endif
+		if (key > 0)
+			// set exposure parameters
+			if(key=='j' || key=='k' || key=='m' || key=='n'){
+				if(key=='j')
+					if(para.m_is_auto_exposure) para.m_expected_brightness += 20;
+					else para.m_exposure_time += 3;
+				else if(key=='k')
+					if(para.m_is_auto_exposure) para.m_expected_brightness -= 20;
+					else para.m_exposure_time -= 3;
+				else if(key=='m'){
+					para.m_is_auto_exposure = !para.m_is_auto_exposure;
+					cout<<"exposure is "<<para.m_is_auto_exposure<<endl;
+				}
+				else if(key=='n'){//return to default
+					para.m_expected_brightness = para.m_exposure_time = 0;
+				}
+				
+				cout<<"Setting exposure parameters....SensorId="<<sensor_id<<endl;
+				para.m_camera_pair_index = sensor_id;
+				set_exposure_param(&para);
+				key = 0;
+			}
+			else {// switch image direction
+#ifdef HAVE_OPENCV
+				destroyAllWindows();
+#endif
+				err_code = stop_transfer();
+				RETURN_IF_ERR(err_code);
+				reset_config();
+
+				if (key == 'q') break;
+				if (key == 'w') sensor_id = e_vbus1;
+				if (key == 'd') sensor_id = e_vbus2;
+				if (key == 'x') sensor_id = e_vbus3;
+				if (key == 'a') sensor_id = e_vbus4;	   
+				if (key == 's') sensor_id = e_vbus5;
+
+				select_greyscale_image(sensor_id, true);
+				select_greyscale_image(sensor_id, false);
+				select_depth_image(sensor_id);
+
+				err_code = start_transfer();
+				RETURN_IF_ERR(err_code);
+				key = 0;
+			}
 	}
 
 	err_code = stop_transfer();

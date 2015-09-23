@@ -26,7 +26,7 @@
 
 ### 1. 新建guidanceSDK_test测试工程
 
-如下图所示，在SDK/demo目录下创建自己的工程，这里在VS2010中创建了一个**“Win32控制台程序”**类型的空工程，工程名为**“guidanceSDK\_test”**。
+如下图所示，在SDK/demo目录下创建自己的工程，这里在VS2010中创建了一个空工程，工程名为**“guidanceSDK\_test”**。
 
 ![新建工程](./Images/en/new_proj.jpg)
 

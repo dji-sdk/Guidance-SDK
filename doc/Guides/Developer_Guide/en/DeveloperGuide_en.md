@@ -6,8 +6,8 @@
 
 Guidance SDK is maintained and updated on GitHub.
 
-- [GuidanceSDK](https://github.com/dji-sdk/GuidanceSDK): the complete package, including header file, library files on all platforms, and all documents.
-- [GuidanceSDKROS](https://github.com/dji-sdk/GuidanceSDKROS): the ROS package, including header file, library files on Ubuntu and Odroid XU3.
+- [Guidance-SDK](https://github.com/dji-sdk/Guidance-SDK): the complete package, including header file, library files on all platforms, and all documents.
+- [Guidance-SDK-ROS](https://github.com/dji-sdk/Guidance-SDK-ROS): the ROS package, including header file, library files on Ubuntu and Odroid XU3.
 
 ## Environment Setup
 

@@ -1,13 +1,13 @@
 # Guidance SDK开发者指南
 
-*如发现任何错误，请通过Github issue或开发者论坛或邮件反馈给我们。欢迎提交pull request来帮助我们修正问题，关于文档的修改需要符合[格式标准](https://github.com/dji-sdk/Guidance-SDK/issues/3)*
+*如发现任何错误，请通过Github issue或开发者论坛或邮件反馈给我们。欢迎提交pull request来帮助我们修正问题，关于文档的修改需要符合[格式标准](https://github.com/dji-sdk/Guidance-SDK/issues/3)*。
 
 ## SDK包下载
 
 Guidance SDK软件包在GitHub上更新和维护。
 
-- [GuidanceSDK](https://github.com/dji-sdk/GuidanceSDK)：完整包。包括头文件、所有平台的库文件、所有文档。
-- [GuidanceSDKROS](https://github.com/dji-sdk/GuidanceSDKROS)：ROS包。包括头文件、Ubuntu及Odroid XU3的库文件。
+- [Guidance-SDK](https://github.com/dji-sdk/Guidance-SDK)：完整包。包括头文件、所有平台的库文件、所有文档。
+- [Guidance-SDK-ROS](https://github.com/dji-sdk/GuidanceSDK-ROS)：ROS包。包括头文件、Ubuntu及Odroid XU3的库文件。
 
 ## 环境配置
 
@@ -175,7 +175,7 @@ Linux默认包含了UART驱动，不需要另外安装。
     
 ***解决方法:***
 
-请确认将系统所对应的**DJI\_guidance.dll**分别复制到了lib文件夹与*.exe程序运行目录下；
+请确认将系统所对应的**DJI\_guidance.dll**分别复制到了lib文件夹与*.exe程序运行目录下；以及其版本是否与可执行程序一致。
 
 
 #### OpenCV相关错误
