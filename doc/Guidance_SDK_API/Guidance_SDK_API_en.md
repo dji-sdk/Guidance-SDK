@@ -131,8 +131,8 @@ enum e_sdk_err_code
 	e_OK = 0,				// Succeed with no error
 	e_load_libusb_err=1,	// Load libusb library error
 	e_sdk_not_inited=2,		// SDK software is not ready
-	e_guidance_hardware_not_ready=3,  // Guidance hardware is not ready
-	e_disparity_not_allowed=4,		// Disparity or depth image is not allowed to be selected in standard mode
+	e_hardware_not_ready=3, // Guidance hardware is not ready
+	e_disparity_not_allowed=4,		// Disparity or depth image is not allowed
 	e_image_frequency_not_allowed=5,  // Image frequency must be one of the enum type e_image_data_frequecy
 	e_config_not_ready=6,			// Config is not ready
 	e_online_flag_not_ready=7,	// Online flag is not ready
@@ -140,6 +140,19 @@ enum e_sdk_err_code
 	e_max_sdk_err = 100			// maximum number of possible SDK errors
 };
 ~~~ 
+
+**Explanation:** 
+1. `e_timeout`: time out during USB transfer.
+2. `e_libusb_io_err`: IO error returned by libusb library. This can be caused by physical connection problem of USB.
+3. `e_OK`: Succeed with no error.
+4. `e_load_libusb_err`: Load libusb library error. This is caused by the inappropriate libusb library.
+5. `e_sdk_not_inited`: SDK software is not ready.
+6. `e_hardware_not_ready`: Guidance hardware is not ready.
+7. `e_disparity_not_allowed`: If your Guidance is working in standard mode with obstacle sensing function activated, disparity or depth image is not allowed to select. The reason is, obstacle sensing has its own way to select disparity images. 
+8. `e_image_frequency_not_allowed`: Image frequency must be one of the enum type `e_image_data_frequecy`.
+9. `e_config_not_ready`: Configuration data is not ready. When Guidance is powered on, it takes several seconds (sometimes longer) to initiate, including loading configuration data (including other data) into memory, and sending to application layer (i.e. the SDK software). If the users start SDK application before configuration data is ready, this error will be thrown. Configuration data includes: Guidance working mode, Guidance Sensor online status, stereo calibration parameters, and so on.
+10. `e_online_flag_not_ready`: Online flag is not ready. Guidance system allows users to use any number of sensors, from 1 to 5. We use an array of online status to indicate which sensor are online. If users subscribe data from a sensor that is not online, no data will be returned.
+11. `e_stereo_cali_not_ready`: Stereo calibration parameters are not ready. The calibration parameters are useful for 3D applications. As the images are already rectified, no distortion coefficients are provided, but only coordinates of the principal point `cu, cv`, focal length `focal`, and baseline `baseline`.  
 
 ###   e_vbus_index
 
@@ -324,16 +337,19 @@ Please reference the protocol of Section 2.1.2 and also the example code of `uar
 	- [select_depth_image](#select_depth_image)
 	- [select_greyscale_image](#select_greyscale_image)
 
-- set callback function handler
+- set callback and exposure
 	- [set_sdk_event_handler](#set_sdk_event_handler)
+	- [set_exposure_param](#set_exposure_param)
 
-- get status 
+- get data 
 	- [get_online_status](#get_online_status)
+	- [get_stereo_cali](#get_stereo_cali)
 
 - transfer control
 	- [start_transfer](#start_transfer)
 	- [stop_transfer](#stop_transfer)
 	- [release_transfer](#release_transfer)
+	- [wait_for_board_ready](#wait_for_board_ready)
 
 ### Method
 
