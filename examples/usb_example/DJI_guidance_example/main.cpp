@@ -19,6 +19,7 @@ using namespace std;
 #define IMAGE_SIZE (HEIGHT * WIDTH)
 
 #define USE_GUIDANCE_ASSISTANT_CONFIG 0 //use GUIDANCE ASSISTANT's configure
+#define SELECT_DEPTH_DATA 0
 
 #ifdef HAVE_OPENCV
 using namespace cv;
@@ -45,12 +46,9 @@ std::ostream& operator<<(std::ostream& out, const e_sdk_err_code value){
 		PROCESS_VAL(e_image_frequency_not_allowed);
 		PROCESS_VAL(e_config_not_ready);
 		PROCESS_VAL(e_online_flag_not_ready);
-		PROCESS_VAL(e_libusb_io_err);
 		PROCESS_VAL(e_stereo_cali_not_ready);
-	case(e_timeout):
-		strcpy(str, "Timout during transfer");
-		s = str;
-		break;
+		PROCESS_VAL(e_libusb_io_err);
+		PROCESS_VAL(e_timeout);
 	default:
 		strcpy(str, "Unknown error");
 		s = str;
@@ -132,7 +130,7 @@ int my_callback(int data_type, int data_len, char *content)
 }
 
 #define RETURN_IF_ERR(err_code) { if( err_code ){ release_transfer(); \
-std::cout<<"Error: "<<err_code<<" at "<<__LINE__<<","<<__FILE__<<std::endl; return -1;}}
+std::cout<<"Error: "<<(e_sdk_err_code)err_code<<" at "<<__LINE__<<","<<__FILE__<<std::endl; return -1;}}
 
 int main(int argc, const char** argv)
 {
@@ -178,10 +176,12 @@ int main(int argc, const char** argv)
 	RETURN_IF_ERR( err_code );
 	err_code = select_greyscale_image( e_vbus2, false );
 	RETURN_IF_ERR( err_code );
+#if SELECT_DEPTH_DATA
 	err_code = select_depth_image( sensor_id );
 	RETURN_IF_ERR( err_code );
 	err_code = select_disparity_image( sensor_id );
 	RETURN_IF_ERR( err_code );
+#endif
 	select_imu();
 	select_ultrasonic();
 	select_obstacle_distance();
@@ -262,7 +262,9 @@ int main(int argc, const char** argv)
 
 				select_greyscale_image(sensor_id, true);
 				select_greyscale_image(sensor_id, false);
+#if SELECT_DEPTH_DATA
 				select_depth_image(sensor_id);
+#endif
 
 				err_code = start_transfer();
 				RETURN_IF_ERR(err_code);

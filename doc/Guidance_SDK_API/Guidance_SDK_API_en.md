@@ -142,6 +142,7 @@ enum e_sdk_err_code
 ~~~ 
 
 **Explanation:** 
+
 1. `e_timeout`: time out during USB transfer.
 2. `e_libusb_io_err`: IO error returned by libusb library. This can be caused by physical connection problem of USB.
 3. `e_OK`: Succeed with no error.

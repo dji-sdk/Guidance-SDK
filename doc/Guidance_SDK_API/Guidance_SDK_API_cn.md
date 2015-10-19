@@ -137,6 +137,7 @@ enum e_sdk_err_code
 ~~~
 
 **解释：** 
+
 1. `e_timeout`: USB传输超时。
 2. `e_libusb_io_err`: libusb库IO错误。这可能由USB的连接错误引起。
 3. `e_OK`: 成功，没有错误。
