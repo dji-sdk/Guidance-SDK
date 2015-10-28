@@ -121,13 +121,13 @@ Guidance SDK支持两种通信协议：USB和串口。
 ~~~ cpp
 enum e_sdk_err_code
 {
-	e_timeout = -7,			// time out
-	e_libusb_io_err = -1,	// libusb IO error
+	e_timeout = -7,						// USB传输超时
+	e_libusb_io_err = -1,				// libusb库IO错误
     e_sdk_no_err = 0,					// 成功，没有错误
     e_load_libusb_err=1,				// 加载的libusb库错误
     e_sdk_not_inited=2,					// SDK软件还没有准备好
-    e_guidance_hardware_not_ready=3,	// Guidance硬件还没有准备好
-    e_disparity_not_allowed=4,			// 视差图或深度图在标准模式下不允许被选择
+    e_hardware_not_ready=3,				// Guidance硬件还没有准备好
+    e_disparity_not_allowed=4,			// 视差图或深度图不允许被选择
     e_image_frequency_not_allowed=5,	// 图像频率必须是枚举类型e_image_data_frequecy之一
     e_config_not_ready=6,				// 配置没有准备好
     e_online_flag_not_ready=7,			// 在线标志没有准备好 
@@ -136,6 +136,19 @@ enum e_sdk_err_code
 };
 ~~~
 
+**解释：** 
+
+1. `e_timeout`: USB传输超时。
+2. `e_libusb_io_err`: libusb库IO错误。这可能由USB的连接错误引起。
+3. `e_OK`: 成功，没有错误。
+4. `e_load_libusb_err`: 加载的libusb库错误。这是由于使用了不正确的libusb库。
+5. `e_sdk_not_inited`: SDK软件还没有准备好。
+6. `e_hardware_not_ready`: Guidance硬件还没有准备好。
+7. `e_disparity_not_allowed`: 如果您的Guidance工作在标准模式下，且激活了障碍物感知功能，那么视差图和深度图是不允许被选择的。因为障碍物感知有自己的选择视差图的方法。
+8. `e_image_frequency_not_allowed`: 图像频率必须是枚举类型`e_image_data_frequecy`之一。目前只支持3种传输频率：5Hz, 10Hz, 20Hz.
+9. `e_config_not_ready`: 配置数据没有准备好。Guidance上电时，需要花几秒钟时间（有时更长）来进行初始化，包括加载配置数据到内存，并将数据发送至应用层（即SDK软件）。如果用户在配置数据准备好之前启动了SDK程序，这个错误就会被抛出。配置数据包括：Guidance的工作模式，Guidance传感模块的在线状态，标定参数，等待。
+10. `e_online_flag_not_ready`: 在线标志没有准备好。Guidance系统允许用户使用任意数目的传感模块，从1到5. 我们使用一个在线状态数组来标识哪些传感模块是在线的。如果用户从不在线的传感模块订阅了数据，那么不会有数据传输过来。
+11. `e_stereo_cali_not_ready`: 摄像头标定参数没有准备好。这个参数对三维应用是有用的。因为图像已经是校正过的图像，我们没有提供畸变系数，只提供了：主点坐标`cu, cv`，焦距`focal`，和基线长度`baseline`.  
 
 ### e\_vbus\_index
 
@@ -324,16 +337,19 @@ typedef struct _exposure_param
 	- [select_depth_image](#select_depth_image)
 	- [select_greyscale_image](#select_greyscale_image)
 
-- 设置回调函数
+- 设置回调函数和曝光
 	- [set_sdk_event_handler](#set_sdk_event_handler)
+	- [set_exposure_param](#set_exposure_param)
 
-- 获取状态
+- 获取数据
 	- [get_online_status](#get_online_status)
+	- [get_stereo_cali](#get_stereo_cali)
 
 - 传输控制
 	- [start_transfer](#start_transfer)
 	- [stop_transfer](#stop_transfer)
 	- [release_transfer](#release_transfer)
+	- [wait_for_board_ready](#wait_for_board_ready)
 
 ### 方法
 

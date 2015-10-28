@@ -30,8 +30,8 @@ enum e_sdk_err_code
 	e_OK = 0,				// Succeed with no error
 	e_load_libusb_err=1,	// Load libusb library error
 	e_sdk_not_inited=2,		// SDK software is not ready
-	e_guidance_hardware_not_ready=3,  // Guidance hardware is not ready
-	e_disparity_not_allowed=4,		// Disparity or depth image is not allowed to be selected in standard mode
+	e_hardware_not_ready=3, // Guidance hardware is not ready
+	e_disparity_not_allowed=4,		// Disparity or depth image is not allowed to be selected
 	e_image_frequency_not_allowed=5,  // Image frequency must be one of the enum type e_image_data_frequecy
 	e_config_not_ready=6,			// Config is not ready
 	e_online_flag_not_ready=7,	// Online flag is not ready
