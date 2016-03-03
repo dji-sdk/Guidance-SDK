@@ -194,6 +194,7 @@ enum e_guidance_event
     e_ultrasonic,           // called back when ultrasonic comes 
     e_velocity,             // called back when velocity data comes 
     e_obstacle_distance,    // called back when obstacle data comes 
+	e_motion,               // called back when global position comes
     e_event_num
 };
 ~~~
@@ -316,6 +317,40 @@ typedef struct _exposure_param
 }exposure_param;
 ~~~ 
 
+### motion
+**描述:**  定义全局位置数据结构。位置单位为`m`，速度单位为`m/s`.
+~~~ cpp
+typedef struct _motion
+{
+	unsigned int     frame_index;
+	unsigned int     time_stamp;
+
+	int		         corresponding_imu_index;
+
+	float		     q0;
+	float		     q1;
+	float		     q2;
+	float		     q3;
+	int			     attitude_status;  // 0:invalid; 1:valid
+
+	float		     position_in_global_x;  // position in global frame: x 
+	float		     position_in_global_y;  // position in global frame: y 
+	float		     position_in_global_z;  // position in global frame: z 
+	int			     position_status; // lower 3 bits are confidence. 0:invalid; 1:valid
+
+	float		     velocity_in_global_x;  // velocity in global frame: x 
+	float		     velocity_in_global_y;  // velocity in global frame: y 
+	float		     velocity_in_global_z;  // velocity in global frame: z 
+	int			     velocity_status; // lower 3 bits are confidence. 0:invalid; 1:valid
+
+	float		     reserve_float[8];
+	int			     reserve_int[4];
+
+	float   	     uncertainty_location[3];// uncertainty of position
+	float   	     uncertainty_velocity[3];// uncertainty of velocity
+} motion;
+~~~
+
 ## API
 
 ### 概述
@@ -335,7 +370,9 @@ typedef struct _exposure_param
 	- [select_obstacle_distance ](#select_obstacle_distance )
 	- [set_image_frequecy](#set_image_frequecy)
 	- [select_depth_image](#select_depth_image)
+	- [select_disparity_image](#select_disparity_image)
 	- [select_greyscale_image](#select_greyscale_image)
+	- [select_motion](#select_motion)
 
 - 设置回调函数和曝光
 	- [set_sdk_event_handler](#set_sdk_event_handler)
@@ -344,6 +381,8 @@ typedef struct _exposure_param
 - 获取数据
 	- [get_online_status](#get_online_status)
 	- [get_stereo_cali](#get_stereo_cali)
+	- [get_device_type](#get_device_type) 
+	- [get_image_size](#get_image_size)
 
 - 传输控制
 	- [start_transfer](#start_transfer)
@@ -407,7 +446,7 @@ SDK_API void select_ultrasonic ( void );
 
 #### select_velocity
 
-- **描述：**订阅速度数据。
+- **描述：**订阅速度数据。注意该速度是体坐标系下的速度。
 - **参数：**空
 - **返回：**空
 
@@ -442,10 +481,20 @@ SDK_API int set_image_frequecy ( e_image_data_frequecy frequecy );
 
 - **描述：**订阅深度图像数据。
 - **参数：**`camera_pair_index` 选定双目相机对的索引。
-- **返回：**空
+- **返回：**`错误码`。如果发生错误则非零。
 
 ~~~ cpp
-SDK_API void select_depth_image ( e_vbus_index camera_pair_index );
+SDK_API int select_depth_image ( e_vbus_index camera_pair_index );
+~~~
+
+#### select_disparity_image
+
+- **描述：**订阅视差图像数据。视差图像可以用filterSpeckles等函数进行滤波处理。
+- **参数：**`camera_pair_index` 选定双目相机对的索引。
+- **返回：**`错误码`。如果发生错误则非零。
+
+~~~ cpp
+SDK_API int select_disparity_image ( e_vbus_index camera_pair_index );
 ~~~
 
 #### select_greyscale_image
@@ -506,6 +555,27 @@ SDK_API int release_transfer ( void );
 
 ~~~ cpp
 SDK_API int get_online_status (int online_status[CAMERA_PAIR_NUM] );
+~~~
+
+#### get_device_type
+
+- **描述：**获取设备类型。目前只支持Guidance一种设备。
+- **参数：**`device_type` 设备类型。
+- **返回：**`错误码`。如果发生错误则非零。
+
+~~~ cpp
+SDK_API int get_device_type(e_device_type* device_type);
+~~~
+
+#### get_image_size
+
+- **描述：**获取图像大小。
+- **参数：**`width` 图像宽度。
+- **参数：**`height` 图像高度。
+- **返回：**`错误码`。如果发生错误则非零。
+
+~~~ cpp
+SDK_API	int get_image_size(int* width, int* height);
 ~~~
 
 ####  wait_for_board_ready

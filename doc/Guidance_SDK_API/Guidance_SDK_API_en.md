@@ -197,6 +197,7 @@ enum e_guidance_event
 	e_ultrasonic,        	    // called back when ultrasonic comes 
 	e_velocity,	    	        // called back when velocity data comes 
 	e_obstacle_distance,	    // called back when obstacle data comes 
+	e_motion,               	// called back when global position comes
 	e_event_num
 };
 ~~~ 
@@ -317,6 +318,42 @@ typedef struct _exposure_param
 }exposure_param;
 ~~~ 
 
+### motion
+
+**Description:**  Define global motion data. Unit is `m` for position and `m/s` for velocity.
+
+~~~ cpp
+typedef struct _motion
+{
+	unsigned int     frame_index;
+	unsigned int     time_stamp;
+
+	int		         corresponding_imu_index;
+
+	float		     q0;
+	float		     q1;
+	float		     q2;
+	float		     q3;
+	int			     attitude_status;  // 0:invalid; 1:valid
+
+	float		     position_in_global_x;  // position in global frame: x 
+	float		     position_in_global_y;  // position in global frame: y 
+	float		     position_in_global_z;  // position in global frame: z 
+	int			     position_status; // lower 3 bits are confidence. 0:invalid; 1:valid
+
+	float		     velocity_in_global_x;  // velocity in global frame: x 
+	float		     velocity_in_global_y;  // velocity in global frame: y 
+	float		     velocity_in_global_z;  // velocity in global frame: z 
+	int			     velocity_status; // lower 3 bits are confidence. 0:invalid; 1:valid
+
+	float		     reserve_float[8];
+	int			     reserve_int[4];
+
+	float   	     uncertainty_location[3];// uncertainty of position
+	float   	     uncertainty_velocity[3];// uncertainty of velocity
+} motion;
+~~~
+
 ## API
 
 ### Overview
@@ -336,7 +373,9 @@ Please reference the protocol of Section 2.1.2 and also the example code of `uar
 	- [select_obstacle_distance ](#select_obstacle_distance )
 	- [set_image_frequecy](#set_image_frequecy)
 	- [select_depth_image](#select_depth_image)
+	- [select_disparity_image](#select_disparity_image)
 	- [select_greyscale_image](#select_greyscale_image)
+	- [select_motion](#select_motion)
 
 - set callback and exposure
 	- [set_sdk_event_handler](#set_sdk_event_handler)
@@ -345,6 +384,8 @@ Please reference the protocol of Section 2.1.2 and also the example code of `uar
 - get data 
 	- [get_online_status](#get_online_status)
 	- [get_stereo_cali](#get_stereo_cali)
+	- [get_device_type](#get_device_type) 
+	- [get_image_size](#get_image_size)
 
 - transfer control
 	- [start_transfer](#start_transfer)
@@ -443,6 +484,17 @@ SDK_API int select_depth_image( e_vbus_index camera_pair_index );
 
 ####  select_disparity_image
 
+- **Description:**   Subscribe disparity image, which can be filtered with functions such as filterSpeckles.
+- **Parameters:**  `camera_pair_index` index of camera pair selected
+- **Return:**  `error code`. Non-zero if error occurs.
+
+~~~ cpp
+SDK_API int select_disparity_image( e_vbus_index camera_pair_index );
+~~~ 
+
+
+####  select_disparity_image
+
 - **Description:**   Subscribe disparity image.
 - **Parameters:**  `camera_pair_index` index of camera pair selected
 - **Return:**  `error code`. Non-zero if error occurs.
@@ -516,6 +568,27 @@ SDK_API int get_stereo_cali( stereo_cali stereo_cali_pram[CAMERA_PAIR_NUM]);
 
 ~~~ cpp
 SDK_API int get_online_status(int online_status[CAMERA_PAIR_NUM]);
+~~~ 
+
+####  get_device_type
+
+- **Description:**  Get the type of devices. Currently only support one type of device: Guidance. 
+- **Parameters:**  `device_type` Device type.
+- **Return:**   `error code`. Non-zero if error occurs.
+
+~~~ cpp
+SDK_API int get_device_type(e_device_type* device_type);
+~~~ 
+
+####  get_image_size
+
+- **Description:**  Get the size of image data.
+- **Parameters:**  `width` Image width.
+- **Parameters:**  `height` Image height.
+- **Return:**   `error code`. Non-zero if error occurs.
+
+~~~ cpp
+SDK_API	int get_image_size(int* width, int* height);
 ~~~ 
 
 ####  wait_for_board_ready
