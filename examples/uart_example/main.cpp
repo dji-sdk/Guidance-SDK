@@ -69,7 +69,11 @@ int main()
 					if ( e_velocity == cmd_id )
 					{
 						velocity vo;
-						memcpy( &vo, data + 2, sizeof(vo) );
+						soc2pc_vo_can_output output;
+						memcpy( &output, data + 2, sizeof(vo) );
+						vo.vx = output.m_vo_output.vx;
+						vo.vy = output.m_vo_output.vy;
+						vo.vz = output.m_vo_output.vz;
 						printf( "vx:%f vy:%f vz:%f\n", 0.001f * vo.vx, 0.001f * vo.vy, 0.001f * vo.vz );
 						printf( "frame index:%d,stamp:%d\n", vo.frame_index, vo.time_stamp );
 						printf( "\n" );

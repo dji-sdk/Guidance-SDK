@@ -13,8 +13,8 @@ using namespace std;
 #endif
 
 
-#define WIDTH 320
-#define HEIGHT 240
+int WIDTH=320;
+int HEIGHT=240;
 #define IMAGE_SIZE (HEIGHT * WIDTH)
 
 #define USE_GUIDANCE_ASSISTANT_CONFIG 0 //use GUIDANCE ASSISTANT's configure
@@ -22,10 +22,10 @@ using namespace std;
 
 #ifdef HAVE_OPENCV
 using namespace cv;
-Mat     g_greyscale_image_left[CAMERA_PAIR_NUM];
-Mat		g_greyscale_image_right[CAMERA_PAIR_NUM];
-Mat		g_depth[CAMERA_PAIR_NUM];//(HEIGHT,WIDTH,CV_16SC1);
-Mat		g_disparity[CAMERA_PAIR_NUM];//(HEIGHT,WIDTH,CV_16SC1);
+Mat     g_greyscale_image_left;
+Mat		g_greyscale_image_right;
+Mat		g_depth;
+Mat		g_disparity;
 #endif
 e_vbus_index sensor_id = e_vbus1;
 
@@ -66,25 +66,22 @@ int my_callback(int data_type, int data_len, char *content)
 		image_data* data = (image_data* )content;
 		printf( "frame index:%d,stamp:%d\n", data->frame_index, data->time_stamp );
 #ifdef HAVE_OPENCV
-		for ( int d = 0; d < CAMERA_PAIR_NUM; ++d )
-		{
-			if ( data->m_greyscale_image_left[d] ){
-				g_greyscale_image_left[d] = Mat::zeros(HEIGHT,WIDTH,CV_8UC1);
-				memcpy( g_greyscale_image_left[d].data, data->m_greyscale_image_left[d], IMAGE_SIZE );
-			}else g_greyscale_image_left[d].release();
-			if ( data->m_greyscale_image_right[d] ){
-				g_greyscale_image_right[d] = Mat::zeros(HEIGHT,WIDTH,CV_8UC1);
-				memcpy( g_greyscale_image_right[d].data, data->m_greyscale_image_right[d], IMAGE_SIZE );
-			}else g_greyscale_image_right[d].release();
-			if ( data->m_depth_image[d] ){
-				g_depth[d] = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
-				memcpy( g_depth[d].data, data->m_depth_image[d], IMAGE_SIZE * 2 );
-			}else g_depth[d].release();
-			if ( data->m_disparity_image[d] ){
-				g_disparity[d] = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
-				memcpy( g_disparity[d].data, data->m_disparity_image[d], IMAGE_SIZE * 2 );
-			}else g_disparity[d].release();
-		}
+		if ( data->m_greyscale_image_left[sensor_id] ){
+			g_greyscale_image_left = Mat::zeros(HEIGHT,WIDTH,CV_8UC1);
+			memcpy( g_greyscale_image_left.data, data->m_greyscale_image_left[sensor_id], IMAGE_SIZE );
+		}else g_greyscale_image_left.release();
+		if ( data->m_greyscale_image_right[sensor_id] ){
+			g_greyscale_image_right = Mat::zeros(HEIGHT,WIDTH,CV_8UC1);
+			memcpy( g_greyscale_image_right.data, data->m_greyscale_image_right[sensor_id], IMAGE_SIZE );
+		}else g_greyscale_image_right.release();
+		if ( data->m_depth_image[sensor_id] ){
+			g_depth = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
+			memcpy( g_depth.data, data->m_depth_image[sensor_id], IMAGE_SIZE * 2 );
+		}else g_depth.release();
+		if ( data->m_disparity_image[sensor_id] ){
+			g_disparity = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
+			memcpy( g_disparity.data, data->m_disparity_image[sensor_id], IMAGE_SIZE * 2 );
+		}else g_disparity.release();
 #endif
 	}
 
@@ -122,6 +119,10 @@ int my_callback(int data_type, int data_len, char *content)
 		printf( "frame index:%d,stamp:%d\n", ultrasonic->frame_index, ultrasonic->time_stamp );
 	}
 
+	if(e_motion == data_type && NULL!=content){
+		motion* m=(motion*)content;
+		printf("(px,py,pz)=(%.2f,%.2f,%.2f)\n", m->position_in_global_x,m->position_in_global_y,m->position_in_global_z);
+	}
 	g_lock.leave();
 	g_event.set_event();
 
@@ -171,10 +172,6 @@ int main(int argc, const char** argv)
 	RETURN_IF_ERR( err_code );
 	err_code = select_greyscale_image( sensor_id, false );
 	RETURN_IF_ERR( err_code );
-	err_code = select_greyscale_image( e_vbus2, true );
-	RETURN_IF_ERR( err_code );
-	err_code = select_greyscale_image( e_vbus2, false );
-	RETURN_IF_ERR( err_code );
 #if SELECT_DEPTH_DATA
 	err_code = select_depth_image( sensor_id );
 	RETURN_IF_ERR( err_code );
@@ -185,7 +182,15 @@ int main(int argc, const char** argv)
 	select_ultrasonic();
 	select_obstacle_distance();
 	select_velocity();
+	select_motion();
 #endif
+
+	e_device_type dt;
+	get_device_type(&dt);
+	cout<<"device type: "<<(dt==Guidance?"Guidance":"GuidanceLite")<<endl;
+
+	get_image_size(&WIDTH, &HEIGHT);
+	cout<<"(width, height)="<<WIDTH<<", "<<HEIGHT<<endl;
 
 	err_code = set_sdk_event_handler( my_callback );
 	RETURN_IF_ERR( err_code );
@@ -203,22 +208,20 @@ int main(int argc, const char** argv)
 	{
 		g_event.wait_event();
 #ifdef HAVE_OPENCV
-		for(int d=0;d<CAMERA_PAIR_NUM;d++){
-			if(!g_greyscale_image_left[d].empty())
-				imshow(string("left_")+char('0'+d), g_greyscale_image_left[d]);
-			if(!g_greyscale_image_right[d].empty())
-				imshow(string("right_")+char('0'+d), g_greyscale_image_right[d]);
+		if(!g_greyscale_image_left.empty())
+			imshow(string("left_")+char('0'+sensor_id), g_greyscale_image_left);
+		if(!g_greyscale_image_right.empty())
+			imshow(string("right_")+char('0'+sensor_id), g_greyscale_image_right);
 
-			if(!g_depth[d].empty()){
-				Mat depth8(HEIGHT,WIDTH,CV_8UC1);
-				g_depth[d].convertTo(depth8, CV_8UC1);
-				imshow(string("depth_")+char('0'+d), depth8);
-			}
-			if(!g_disparity[d].empty()){
-				Mat disp8(HEIGHT,WIDTH, CV_8UC1);
-				g_disparity[d].convertTo(disp8, CV_8UC1);
-				imshow(string("disparity_")+char('0'+d), disp8);
-			}
+		if(!g_depth.empty()){
+			Mat depth8(HEIGHT,WIDTH,CV_8UC1);
+			g_depth.convertTo(depth8, CV_8UC1);
+			imshow(string("depth_")+char('0'+sensor_id), depth8);
+		}
+		if(!g_disparity.empty()){
+			Mat disp8(HEIGHT,WIDTH, CV_8UC1);
+			g_disparity.convertTo(disp8, CV_8UC1);
+			imshow(string("disparity_")+char('0'+sensor_id), disp8);
 		}
 		key = waitKey(1);
 #endif
@@ -263,8 +266,8 @@ int main(int argc, const char** argv)
 				select_greyscale_image(sensor_id, false);
 #if SELECT_DEPTH_DATA
 				select_depth_image(sensor_id);
+				select_disparity_image(sensor_id);
 #endif
-
 				err_code = start_transfer();
 				RETURN_IF_ERR(err_code);
 				key = 0;

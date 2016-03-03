@@ -25,7 +25,15 @@ Official Guidance SDK package for accessing the rich categories of output data f
 -	**examples**: examples for USB and UART
 -	**include**: Header file of Guidance SDK 
 -	**lib**: Library files for Windows
--	**so**: Library files for Linux
+	- 2010/x64: build with Visual Studio 2010 64 bit
+	- 2010/x86: build with Visual Studio 2010 32 bit
+	- 2013/x64: build with Visual Studio 2013 64 bit
+	- 2013/x86: build with Visual Studio 2013 32 bit
+-	**so**: Library files for Linux	
+	- x64: build with `g++` on 64 bit Linux system
+	- x86: build with `g++` on 32 bit Linux system
+	- XU3: build with `g++` on XU3
+	- arm: build with latest `arm-linux-gnueabi-g++` for embedded ARM systems.Please install the cross-compiling toolchain by `sudo apt-get install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi`
 
 Also notice that, to enable fast download for ROS users, we have a separate ROS repo with much smaller size: [Guidance-SDK-ROS](https://github.com/dji-sdk/Guidance-SDK-ROS).
 
@@ -63,7 +71,15 @@ Guidance SDK可以让开发者通过Guidance的USB口和串口来获取丰富的
 -	**examples**: USB和串口的简单示例程序
 -	**include**: Guidance SDK头文件 
 -	**lib**: Windows下的库文件
--	**so**: Linux下的库文件
+	- 2010/x64: 使用 Visual Studio 2010 64 bit 编译
+	- 2010/x86: 使用 Visual Studio 2010 32 bit 编译
+	- 2013/x64: 使用 Visual Studio 2013 64 bit 编译
+	- 2013/x86: 使用 Visual Studio 2013 32 bit 编译
+-	**so**: Linux下的库文件	
+	- x64: 在64位Linux系统上用 `g++` 编译
+	- x86: 在32位Linux系统上用 `g++` 编译
+	- XU3: 在XU3上用 `g++` 编译 
+	- arm: 使用最新的 `arm-linux-gnueabi-g++` 编译，供嵌入式ARM系统使用。使用时，请先安装交叉编译工具链：`sudo apt-get install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi`
 
 请注意，为了便于ROS用户的快速下载，我们还维护了一个独立的ROS包。它不包含任何文档和Windows下的库文件，因此具有更小的体积：[Guidance-SDK-ROS](https://github.com/dji-sdk/Guidance-SDK-ROS).
 

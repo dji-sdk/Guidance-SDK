@@ -20,6 +20,37 @@ typedef struct _protocal_sdk_uart_header
 
 #pragma pack()
 
+typedef struct _VO_OUTPUT
+{
+	short cnt;
+
+	short vx;
+	short vy;
+	short vz;
+
+	float x;
+	float y;
+	float z;
+
+	float reserved[12];
+
+	float height;
+	float uncertainty_height;
+
+	unsigned char reserve[4];
+}VO_OUTPUT;
+
+#pragma pack()
+
+class soc2pc_vo_can_output
+{
+public:
+	VO_OUTPUT  m_vo_output;
+	unsigned int  m_frame_index;
+	unsigned int  m_time_stamp;
+	unsigned int  m_reserved[9];
+};
+
 bool is_header_valid( protocal_sdk_uart_header *header );
 
 bool is_packet_valid( protocal_sdk_uart_header *header );
