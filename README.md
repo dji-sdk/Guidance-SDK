@@ -92,7 +92,7 @@ USB和串口的示例代码可以在 *examples/usb\_example* 和 *examples/uart\
 
 USB和串口的示例代码可以在同样的目录（*examples/usb\_example* 和 *examples/uart\_example*）中找到，其中包含了可直接编译的Makefile文件。
 
-注意，在Linux下读写Guidance的USB口需要root权限。为了省去每次运行Guidance SDK程序都要输入`sudo`的麻烦，建设在 `/etc/udev/rules.d` 下添加一个规则文件，即 **doc/51-guidance.rules**. 或者也可以从终端输入下面的这行：
+注意，在Linux下读写Guidance的USB口需要root权限。为了省去每次运行Guidance SDK程序都要输入`sudo`的麻烦，建议在 `/etc/udev/rules.d` 下添加一个规则文件，即 **doc/51-guidance.rules**. 或者也可以从终端输入下面的这行：
 
 	sudo sh -c 'echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"fff0\", ATTR{idProduct}==\"d009\", MODE=\"0666\"" > /etc/udev/rules.d/51-guidance.rules'
 
