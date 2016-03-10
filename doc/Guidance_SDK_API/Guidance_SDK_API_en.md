@@ -493,14 +493,13 @@ SDK_API int select_disparity_image( e_vbus_index camera_pair_index );
 ~~~ 
 
 
-####  select_disparity_image
+####  select_motion
 
-- **Description:**   Subscribe disparity image.
-- **Parameters:**  `camera_pair_index` index of camera pair selected
+- **Description:**   Subscribe global motion data, i.e. velocity and position of Guidance in global coordinate system.
 - **Return:**  `error code`. Non-zero if error occurs.
 
 ~~~ cpp
-SDK_API int select_disparity_image( e_vbus_index camera_pair_index );
+SDK_API void select_motion( void );
 ~~~ 
 
 ####  set_image_frequecy

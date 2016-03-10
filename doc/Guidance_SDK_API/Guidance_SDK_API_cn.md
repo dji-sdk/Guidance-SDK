@@ -507,6 +507,15 @@ SDK_API int select_disparity_image ( e_vbus_index camera_pair_index );
 SDK_API int select_greyscale_image ( e_vbus_index camera_pair_index, bool is_left );
 ~~~
 
+#### select_motion
+
+- **描述：**订阅全局运动信息，即全局坐标系下Guidance的速度和位置。
+- **返回：**`错误码`。如果发生错误则非零。
+
+~~~ cpp
+SDK_API void select_motion( void );
+~~~ 
+
 #### set_sdk_event_handler
 
 - **描述：**设置回调函数指针。当有数据从Guidance传过来时，回调函数将被传输线程调用。

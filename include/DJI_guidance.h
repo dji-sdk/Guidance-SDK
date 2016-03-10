@@ -265,15 +265,15 @@ SDK_API void select_ultrasonic( void );
 
 /**  
 *     @fn void select_velocity();
-*     @brief  subscribe velocity data, i.e. velocity of Guidance in body coordinate system.
+*     @brief  Subscribe velocity data, i.e. velocity of Guidance in body coordinate system.
 *     @return `error code`. Non-zero if error occurs.
 */
 SDK_API void select_velocity( void );
 
 /**  
 *     @fn int select_motion();
-*     @brief  subscribe to motion data, i.e. velocity of GUIDANCE in body coordinate system.
-*     @return   error code,if error occur,it will be non zero
+*     @brief  Subscribe motion data, i.e. velocity and position of Guidance in global coordinate system.
+*     @return  `error code`. Non-zero if error occurs.
 */
 SDK_API void select_motion( void );
 
