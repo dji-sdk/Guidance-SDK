@@ -219,6 +219,7 @@ typedef struct _image_data
 ~~~ 
 
 **Explanation:**
+
 1. `m_greyscale_image_left` and `m_greyscale_image_right` are both 320 hight, 240 width, 8 bit grayscale images.
 2. `m_depth_image` is 320 hight, 240 width, 16 bit depth image. Every 2 bytes describes the depth of a single point (in big-endian format), with the lower 7 bits being fraction and higher 9 bits being integer.
 3. `m_disparity_image` is 320 hight, 240 width, 16 bit depth image. Every 2 bytes describes the disparity of a single point (in big-endian format), with the lower 4 bits being fraction and higher 12 bits being integer.
