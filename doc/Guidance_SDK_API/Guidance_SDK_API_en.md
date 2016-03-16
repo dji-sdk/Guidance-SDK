@@ -213,10 +213,15 @@ typedef struct _image_data
 	unsigned int     time_stamp;	                              // time stamp of image captured in ms 
 	char             *m_greyscale_image_left[CAMERA_PAIR_NUM];	  // greyscale image of left camera 
 	char             *m_greyscale_image_right[CAMERA_PAIR_NUM];   // greyscale image of right camera 
-	char             *m_depth_image[CAMERA_PAIR_NUM];	          // depth image in meters 
-	char             *m_disparity_image[CAMERA_PAIR_NUM];         // disparity image in pixels 
+	char             *m_depth_image[CAMERA_PAIR_NUM];	          // depth image in *128 meters 
+	char             *m_disparity_image[CAMERA_PAIR_NUM];         // disparity image in *16 pixels 
 }image_data;
 ~~~ 
+
+**Explanation:**
+1. `m_greyscale_image_left` and `m_greyscale_image_right` are both 320 hight, 240 width, 8 bit grayscale images.
+2. `m_depth_image` is 320 hight, 240 width, 16 bit depth image. Every 2 bytes describes the depth of a single point (in big-endian format), with the lower 7 bits being fraction and higher 9 bits being integer.
+3. `m_disparity_image` is 320 hight, 240 width, 16 bit depth image. Every 2 bytes describes the disparity of a single point (in big-endian format), with the lower 4 bits being fraction and higher 12 bits being integer.
 
 ###   ultrasonic_data
 
@@ -482,6 +487,61 @@ SDK_API int select_greyscale_image( e_vbus_index camera_pair_index, bool is_left
 SDK_API int select_depth_image( e_vbus_index camera_pair_index );
 ~~~ 
 
+**Example:**
+~~~ cpp
+#include "DJI_guidance.h"
+#include "DJI_utility.h"
+#include "opencv2/opencv.hpp"
+#include <stdio.h>
+#include <string>
+
+e_vbus_index sensor_id = e_vbus1;
+Mat		g_depth;
+int my_callback(int data_type, int data_len, char *content)
+{
+	g_lock.enter();
+	if (e_image == data_type && NULL != content)
+	{
+		image_data* data = (image_data* )content;
+		if ( data->m_depth_image[sensor_id] ){
+			g_depth = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
+			memcpy( g_depth.data, data->m_depth_image[sensor_id], IMAGE_SIZE * 2 );
+		}
+	}
+	g_lock.leave();
+	g_event.set_event();
+
+	return 0;
+}
+
+int main(int argc, const char** argv)
+{
+	reset_config();  // clear all data subscription
+	int err_code = init_transfer(); //wait for board ready and init transfer thread
+
+	err_code = select_depth_image( sensor_id );
+	
+	err_code = set_sdk_event_handler( my_callback );	
+	err_code = start_transfer();	
+	
+	while(1)
+	{
+		g_event.wait_event();
+		if(!g_depth.empty()){
+			Mat depth8(HEIGHT,WIDTH,CV_8UC1);
+			g_depth.convertTo(depth8, CV_8UC1);
+			imshow(string("depth_")+char('0'+sensor_id), depth8);
+			printf("Depth at point (%d,%d) is %f meters!\n", HEIGHT/2, WIDTH/2,  float(g_depth.at<short>( HEIGHT/2,WIDTH/2))/128);
+		}
+	}
+
+	err_code = stop_transfer();
+	//make sure the ack packet from GUIDANCE is received
+	sleep( 1000000 );
+	err_code = release_transfer();
+}
+~~~
+
 ####  select_disparity_image
 
 - **Description:**   Subscribe disparity image, which can be filtered with functions such as filterSpeckles.
@@ -492,6 +552,60 @@ SDK_API int select_depth_image( e_vbus_index camera_pair_index );
 SDK_API int select_disparity_image( e_vbus_index camera_pair_index );
 ~~~ 
 
+**Example:**
+~~~ cpp
+#include "DJI_guidance.h"
+#include "DJI_utility.h"
+#include "opencv2/opencv.hpp"
+#include <stdio.h>
+#include <string>
+
+e_vbus_index sensor_id = e_vbus1;
+Mat		g_disparity;
+int my_callback(int data_type, int data_len, char *content)
+{
+	g_lock.enter();
+	if (e_image == data_type && NULL != content)
+	{
+		image_data* data = (image_data* )content;
+		if ( data->m_disparity_image[sensor_id] ){
+			g_disparity = Mat::zeros(HEIGHT,WIDTH,CV_16SC1);
+			memcpy( g_disparity.data, data->m_disparity_image[sensor_id], IMAGE_SIZE * 2 );
+		}
+	}
+	g_lock.leave();
+	g_event.set_event();
+
+	return 0;
+}
+
+int main(int argc, const char** argv)
+{
+	reset_config();  // clear all data subscription
+	int err_code = init_transfer(); //wait for board ready and init transfer thread
+
+	err_code = select_disparity_image( sensor_id );
+	
+	err_code = set_sdk_event_handler( my_callback );	
+	err_code = start_transfer();	
+	
+	while(1)
+	{
+		g_event.wait_event();
+		if(!g_disparity.empty()){
+			Mat disp8(HEIGHT,WIDTH,CV_8UC1);
+			g_disparity.convertTo(disp8, CV_8UC1);
+			imshow(string("disparity_")+char('0'+sensor_id), disp8);
+			printf("Disparity at point (%d,%d) is %f pixels!\n", HEIGHT/2, WIDTH/2,  float(g_disparity.at<short>( HEIGHT/2,WIDTH/2))/16);
+		}
+	}
+
+	err_code = stop_transfer();
+	//make sure the ack packet from GUIDANCE is received
+	sleep( 1000000 );
+	err_code = release_transfer();
+}
+~~~
 
 ####  select_motion
 

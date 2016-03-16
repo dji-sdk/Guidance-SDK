@@ -18,7 +18,7 @@ int HEIGHT=240;
 #define IMAGE_SIZE (HEIGHT * WIDTH)
 
 #define USE_GUIDANCE_ASSISTANT_CONFIG 0 //use GUIDANCE ASSISTANT's configure
-#define SELECT_DEPTH_DATA 0
+#define SELECT_DEPTH_DATA 1
 
 #ifdef HAVE_OPENCV
 using namespace cv;
@@ -217,11 +217,13 @@ int main(int argc, const char** argv)
 			Mat depth8(HEIGHT,WIDTH,CV_8UC1);
 			g_depth.convertTo(depth8, CV_8UC1);
 			imshow(string("depth_")+char('0'+sensor_id), depth8);
+			printf("Depth at point (%d,%d) is %f meters!\n", HEIGHT/2, WIDTH/2,  float(g_depth.at<short>( HEIGHT/2,WIDTH/2))/128);
 		}
 		if(!g_disparity.empty()){
 			Mat disp8(HEIGHT,WIDTH, CV_8UC1);
 			g_disparity.convertTo(disp8, CV_8UC1);
 			imshow(string("disparity_")+char('0'+sensor_id), disp8);
+			printf("Disparity at point (%d,%d) is %f pixels!\n", HEIGHT/2, WIDTH/2,  float(g_disparity.at<short>( HEIGHT/2,WIDTH/2))/16);
 		}
 		key = waitKey(1);
 #endif
