@@ -216,6 +216,7 @@ typedef struct _image_data
 ~~~ 
 
 **解释：**
+
 1. `m_greyscale_image_left`和`m_greyscale_image_right`都是宽320，高240的8比特灰度图。
 2. `m_depth_image`是宽320，高240的16比特深度图，每两个字节描述一个点的深度，低7位为小数位，高9位为整数位。
 3. `m_disparity_image`是宽320，高240的16比特视差图，每两个字节描述一个点的深度，低4位为小数位，高12位为整数位。
