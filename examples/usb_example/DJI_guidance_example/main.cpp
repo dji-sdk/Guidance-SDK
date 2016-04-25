@@ -227,29 +227,31 @@ int main(int argc, const char** argv)
 		}
 		key = waitKey(1);
 #endif
-		if (key > 0)
+		if (key > 0){
 			// set exposure parameters
-			if(key=='j' || key=='k' || key=='m' || key=='n'){
-				if(key=='j')
-					if(para.m_is_auto_exposure) para.m_expected_brightness += 20;
+			if (key == 'j' || key == 'k' || key == 'm' || key == 'n'){
+				if (key == 'j'){
+					if (para.m_is_auto_exposure) para.m_expected_brightness += 20;
 					else para.m_exposure_time += 3;
-				else if(key=='k')
-					if(para.m_is_auto_exposure) para.m_expected_brightness -= 20;
-					else para.m_exposure_time -= 3;
-				else if(key=='m'){
-					para.m_is_auto_exposure = !para.m_is_auto_exposure;
-					cout<<"exposure is "<<para.m_is_auto_exposure<<endl;
 				}
-				else if(key=='n'){//return to default
+				else if (key == 'k'){
+					if (para.m_is_auto_exposure) para.m_expected_brightness -= 20;
+					else para.m_exposure_time -= 3;
+				}
+				else if (key == 'm'){
+					para.m_is_auto_exposure = !para.m_is_auto_exposure;
+					cout << "exposure is " << para.m_is_auto_exposure << endl;
+				}
+				else if (key == 'n'){//return to default
 					para.m_expected_brightness = para.m_exposure_time = 0;
 				}
-				
-				cout<<"Setting exposure parameters....SensorId="<<sensor_id<<endl;
+
+				cout << "Setting exposure parameters....SensorId=" << sensor_id << endl;
 				para.m_camera_pair_index = sensor_id;
 				set_exposure_param(&para);
 				key = 0;
 			}
-			else {// switch image direction
+			else if (key == 'q' || key == 'w' || key == 'd' || key == 'x' || key == 'a' || key == 's'){// switch image direction
 #ifdef HAVE_OPENCV
 				destroyAllWindows();
 #endif
@@ -261,7 +263,7 @@ int main(int argc, const char** argv)
 				if (key == 'w') sensor_id = e_vbus1;
 				if (key == 'd') sensor_id = e_vbus2;
 				if (key == 'x') sensor_id = e_vbus3;
-				if (key == 'a') sensor_id = e_vbus4;	   
+				if (key == 'a') sensor_id = e_vbus4;
 				if (key == 's') sensor_id = e_vbus5;
 
 				select_greyscale_image(sensor_id, true);
@@ -274,6 +276,7 @@ int main(int argc, const char** argv)
 				RETURN_IF_ERR(err_code);
 				key = 0;
 			}
+		}
 	}
 
 	err_code = stop_transfer();
