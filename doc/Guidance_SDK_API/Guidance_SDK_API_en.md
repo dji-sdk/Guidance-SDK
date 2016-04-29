@@ -111,6 +111,7 @@ Each of the supported data types is described below.
 - [**Velocity Data:**](#velocity) velocity in body frame. The unit is **millimeter/second** and the frequency is 10 Hz.
 - [**Obstacle Distance Data:**](#obstacle_distance) obstacle distance from five Guidance Sensors. The unit is **centimeter** and the frequency is 20 Hz.
 - [**IMU Data:**](#imu) IMU data including accelerometer (in unit of acceleration of gravity **g**) and gyroscope (in quaternion format) data. The frequency is 20 Hz.
+- [**Motion Data:**](#motion) Pose and velocity data including quaternion orientation, position in the global frame, velocity in the global frame.
 - [**Ultrasonic Data:**](#ultrasonic_data) Outputs ultrasonic data from five Guidance Sensors, including obstacle distance (in unit of **meter**) and reliability of the data. The frequency is 20 Hz.
 - [**Greyscale Image:**](#image_data) Outputs Greyscale images for five directions. The image size is 320\*240 bytes for individual sensor. The default frequency is 20 Hz and can be scaled down using API functions.
 - [**Depth Image:**](#image_data) Outputs depth images for five directions. The image size is 320\*240\*2 bytes for each direction. The default frequency is 20 Hz and can be scaled down using API functions.  
