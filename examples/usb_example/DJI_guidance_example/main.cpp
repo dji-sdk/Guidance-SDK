@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string>
+#include <cstring>
 #include <iostream>
 #include "DJI_guidance.h"
 #include "DJI_utility.h"
