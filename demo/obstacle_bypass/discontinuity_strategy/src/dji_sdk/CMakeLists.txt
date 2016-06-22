@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -g -Wall -I/home/dji/opencv_build/include -I/hom
 
 # add_definitions(-g -Wall)
 
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,./ -lpthread -lrt -L./ -L/home/dji/opencv_build/lib -lDJI_guidance -lusb-1.0 -lopencv_core -lopencv_highgui")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,./ -lpthread -lrt -L./ -L/usr/local/lib/ -L/home/dji/opencv_build/lib -lDJI_guidance -lusb-1.0 -lopencv_core -lopencv_highgui")
 
 ### ONBOARD ###
 
@@ -86,7 +86,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 
-file(GLOB DJI_SDK_LIB_SOURCES src/sdk_lib/*.cpp) 
+file(GLOB DJI_SDK_LIB_SOURCES src/sdk_lib/*.cpp)
 
 ##SET_SOURCE_FILES_PROPERTIES(${DJI_SDK_LIB_SOURCES} PROPERTIES LANGUAGE CXX)
 
@@ -95,7 +95,7 @@ file(GLOB DJI_SDK_LIB_SOURCES src/sdk_lib/*.cpp)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
-  "${PROJECT_SOURCE_DIR}/src/sdk_lib"
+  "${PROJECT_SOURCE_DIR}/include"
 )
 
 ## Declare a cpp library
@@ -113,7 +113,8 @@ add_executable(dji_sdk_node src/dji_sdk_node.cpp ${DJI_SDK_LIB_SOURCES})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(dji_sdk_node
    ${catkin_LIBRARIES}
-   ${PROJECT_SOURCE_DIR}/src/sdk_lib/libDJI_guidance.so
-   ${PROJECT_SOURCE_DIR}/src/sdk_lib/DJI_guidance.h
-   ${PROJECT_SOURCE_DIR}/src/sdk_lib/DJI_utility.h
+   ${PROJECT_SOURCE_DIR}/include/libDJI_guidance.so
+   ${PROJECT_SOURCE_DIR}/include/DJI_guidance.h
+   ${PROJECT_SOURCE_DIR}/include/DJI_utility.h
 )
+link_directories(/usr/local/lib)

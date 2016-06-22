@@ -4,18 +4,24 @@
  Author      : Mario Chris
  Description : Obstacle Avoidance
  ============================================================================
- */
+*/
 
-/* Onboard */
+/* System */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sys/time.h>
 #include <unistd.h>
-#include "DJI_Pro_Codec.h"
-#include "DJI_Pro_Hw.h"
-#include "DJI_Pro_Link.h"
-#include "DJI_Pro_App.h"
+
+/* Onboard */
+#include "DJI_Codec.h"
+#include "DJI_Link.h"
+#include "DJI_App.h"
+#include "DJI_API.h"
+#include "DJI_Type.h"
+#include "DJI_Flight.h"
+#include "DJI_HardDriver.h"
+#include "DJI_HardDriver_Manifold.h"
 
 /* Guidance */
 #include "opencv2/video/tracking.hpp"
@@ -26,8 +32,11 @@
 #include "DJI_utility.h"
 #include "imagetransfer.h"
 #include "usb_transfer.h"
+
 using namespace cv;
 using namespace std;
+using namespace DJI;
+using namespace DJI::onboardSDK;
 
 /* additional includes */
 #include <string.h>
@@ -39,29 +48,30 @@ using namespace std;
 #include <math.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #include <thread>
 
-/* enc_key */
-char *key;
-/* req_id for nav closed by app msg */
-req_id_t nav_force_close_req_id = {0};
-/* std msg from uav */
-sdk_std_msg_t recv_sdk_std_msgs = {0};
-/* ros launch param */
-std::string	serial_name;
-int			baud_rate;
-int			app_id;
-int			app_api_level;
-int			app_version;
-std::string	app_bundle_id;
-std::string	enc_key;
-/* activation */
-activation_data_t activation_msg = {14,2,1,""};
-bool cmd_complete = false;
+HardDriver_Manifold* m_hd;
+CoreAPI *coreAPI;
+Flight *flight;
+
+ActivateData user_act_data;
+BroadcastData bc_data;
+
+int ret;
+
+/* roslaunch parameters */
+std::string serial_name;
+unsigned int baud_rate;
+int app_id;
+int app_api_level;
+int app_version;
+char app_key[65];
+string enc_key;
+
+pthread_t m_recvTid;
 
 /* parameter */
-#define TAKEOFF			(uint8_t) 4
-#define LAND			(uint8_t) 6
 #define WIDTH			320
 #define HEIGHT			240
 #define IMAGE_SIZE		(HEIGHT * WIDTH)
@@ -69,12 +79,12 @@ bool cmd_complete = false;
 #define RETURN_IF_ERR(err_code) { if( err_code ){ release_transfer(); printf( "error code:%d,%s %d\n", err_code, __FILE__, __LINE__ );}}
 
 /* guidance */
-int			err_code;
-Mat     	g_greyscale_image_left=Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
-Mat 		g_greyscale_image_right=Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
-int			iter = 0;
-DJI_lock    g_lock;
-DJI_event   g_event;
+int err_code;
+Mat g_greyscale_image_left=Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
+Mat g_greyscale_image_right=Mat::zeros(HEIGHT, WIDTH, CV_8UC1);
+int iter = 0;
+DJI_lock g_lock;
+DJI_event g_event;
 
 // Shi-Tomasi
 #define MIN_CORNERS (uint) 15
@@ -104,190 +114,6 @@ double r_turn = 0; // right image turn control
 double r_alt = 0; // right image altitude control
 double turn_prev = 0; // previous yaw for weighted camera observation
 
-/*************************************/
-
-/*
-  * table of sdk req data handler
-  */
-int16_t sdk_std_msgs_handler(uint8_t cmd_id,uint8_t* pbuf,uint16_t len,req_id_t req_id);
-int16_t	nav_force_close_handler(uint8_t cmd_id,uint8_t* pbuf,uint16_t len,req_id_t req_id);
-/* cmd id table */
-cmd_handler_table_t cmd_handler_tab[] = 
-{
-	{0x00,sdk_std_msgs_handler				},
-	{0x01,nav_force_close_handler			},
-	{ERR_INDEX,NULL							}
-};
-/* cmd set table */
-set_handler_table_t set_handler_tab[] =
-{
-	{0x02,cmd_handler_tab					},
-	{ERR_INDEX,NULL							}
-};
-
-/*
-  * sdk_req_data_callback
-  */
-int16_t nav_force_close_handler(uint8_t cmd_id,uint8_t* pbuf,uint16_t len,req_id_t req_id)
-{
-	if(len != sizeof(uint8_t))
-		return -1;
-	uint8_t msg;
-	memcpy(&msg, pbuf, sizeof(msg));
-	/* test session ack */
-	nav_force_close_req_id.sequence_number = req_id.sequence_number;
-	nav_force_close_req_id.session_id      = req_id.session_id;
-	nav_force_close_req_id.reserve	       = 1;
-
-	printf("WARNING nav close by app %d !!!!!!!!!!!!!! \n", msg);
-	return 0;
-
-}
-
-#define _recv_std_msgs(_flag, _enable, _data, _buf, _datalen) \
-	if( (_flag & _enable))\
-	{\
-		memcpy((uint8_t *)&(_data),(uint8_t *)(_buf)+(_datalen), sizeof(_data));\
-		_datalen += sizeof(_data);\
-	}
-
-int16_t sdk_std_msgs_handler(uint8_t cmd_id,uint8_t* pbuf,uint16_t len,req_id_t req_id)
-{
-	uint16_t *msg_enable_flag = (uint16_t *)pbuf;
-	uint16_t data_len = MSG_ENABLE_FLAG_LEN;
-	
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_TIME	, recv_sdk_std_msgs.time_stamp			, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_Q		, recv_sdk_std_msgs.q				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_A		, recv_sdk_std_msgs.a				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_V		, recv_sdk_std_msgs.v				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_W		, recv_sdk_std_msgs.w				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_POS	, recv_sdk_std_msgs.pos				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_MAG	, recv_sdk_std_msgs.mag				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_RC		, recv_sdk_std_msgs.rc				, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_GIMBAL	, recv_sdk_std_msgs.gimbal			, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_STATUS	, recv_sdk_std_msgs.status			, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_BATTERY	, recv_sdk_std_msgs.battery_remaining_capacity	, pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_DEVICE	, recv_sdk_std_msgs.ctrl_device			, pbuf, data_len);
-
-	return 0;
-}
-
-/* test cmd agency */
-uint8_t test_cmd_send_flag = 1;
-uint8_t test_cmd_is_resend = 0;
-void cmd_callback_test_fun(uint16_t *ack)
-{
-	char result[6][50]={{"REQ_TIME_OUT"},{"REQ_REFUSE"},{"CMD_RECIEVE"},{"STATUS_CMD_EXECUTING"},{"STATUS_CMD_EXE_FAIL"},{"STATUS_CMD_EXE_SUCCESS"}};
-	uint16_t recv_ack = *ack;
-	printf("[DEBUG] recv_ack %#x \n", recv_ack);
-	printf("[TEST_CMD] Cmd result: %s \n", *(result+recv_ack));
-	test_cmd_send_flag = 1;
-	if(recv_ack != STATUS_CMD_EXE_SUCCESS)
-	{
-		test_cmd_is_resend = 1;
-	}
-
-	/* for debug */
-	if(recv_ack != STATUS_CMD_EXE_SUCCESS)
-	{
-		test_cmd_send_flag  = 0;
-		printf("[ERROR] APP LAYER NOT STATUS_CMD_EXE_SUCCESS !!!!!!!!!!!!!!!!!!\n");
-	}	
-	cmd_complete = true;
-	printf("Completed Maneuver...\n");
-} 
-
-/* test activation */
-void test_activation_ack_cmd_callback(ProHeader *header)
-{
-	uint16_t ack_data;
-	printf("Sdk_ack_cmd0_callback,sequence_number=%d,session_id=%d,data_len=%d\n", header->sequence_number, header->session_id, header->length - EXC_DATA_SIZE);
-	memcpy((uint8_t *)&ack_data,(uint8_t *)&header->magic, (header->length - EXC_DATA_SIZE));
-
-	if( is_sys_error(ack_data))
-	{
-		printf("[DEBUG] SDK_SYS_ERROR!!! \n");
-	}
-	else
-	{
-		char result[][50]={{"ACTIVATION_SUCCESS"},{"PARAM_ERROR"},{"DATA_ENC_ERROR"},{"NEW_DEVICE_TRY_AGAIN"},{"DJI_APP_TIMEOUT"},{" DJI_APP_NO_INTERNET"},{"SERVER_REFUSED"},{"LEVEL_ERROR"}};
-		printf("[ACTIVATION] Activation result: %s \n", *(result+ack_data));
-		if(ack_data == 0)
-		{
-			Pro_Config_Comm_Encrypt_Key(key);
-			printf("[ACTIVATION] set key %s\n",key);
-		}
-	}
-	cmd_complete = true;
-	printf("Completed Activation...\n");
-}
-
-void test_activation(void)
-{
-	App_Send_Data( 2, 0, MY_ACTIVATION_SET, API_USER_ACTIVATION,(uint8_t*)&activation_msg,sizeof(activation_msg), test_activation_ack_cmd_callback, 1000, 1);
-	printf("[ACTIVATION] send acticition msg: %d %d %d %d \n", activation_msg.app_id, activation_msg.app_api_level, activation_msg.app_ver ,activation_msg.app_bundle_id[0]);
-}
-
-void sdk_ack_nav_open_close_callback(ProHeader *header)
-{
-	uint16_t ack_data;
-	printf("call %s\n",__func__);
-	printf("Recv ACK,sequence_number=%d,session_id=%d,data_len=%d\n", header->sequence_number, header->session_id, header->length - EXC_DATA_SIZE);
-	memcpy((uint8_t *)&ack_data,(uint8_t *)&header->magic, (header->length - EXC_DATA_SIZE));
-
-	if( is_sys_error(ack_data))
-	{
-		printf("[DEBUG] SDK_SYS_ERROR!!! \n");
-	}
-	cmd_complete = true;
-	printf("Completed API Control...\n");
-}
-
-// onboard monitor command set
-void monitor()
-{
-	uint8_t pbuf;
-	uint16_t *msg_enable_flag = (uint16_t *)(&pbuf);
-	uint16_t data_len = MSG_ENABLE_FLAG_LEN;
-	
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_TIME	, recv_sdk_std_msgs.time_stamp			, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_Q		, recv_sdk_std_msgs.q				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_A		, recv_sdk_std_msgs.a				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_V		, recv_sdk_std_msgs.v				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_W		, recv_sdk_std_msgs.w				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_POS	, recv_sdk_std_msgs.pos				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_MAG	, recv_sdk_std_msgs.mag				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_RC		, recv_sdk_std_msgs.rc				, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_GIMBAL	, recv_sdk_std_msgs.gimbal			, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_STATUS	, recv_sdk_std_msgs.status			, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_BATTERY	, recv_sdk_std_msgs.battery_remaining_capacity	, &pbuf, data_len);
-	_recv_std_msgs( *msg_enable_flag, ENABLE_MSG_DEVICE	, recv_sdk_std_msgs.ctrl_device			, &pbuf, data_len);
-}
-
-// maneuvering
-void maneuver(int ctrl_flag, double roll_or_x, double pitch_or_y, double thr_z, double yaw)
-{
-	api_ctrl_without_sensor_data_t motion = {0}; // initialize motion commands
-	motion.ctrl_flag = ctrl_flag;
-	motion.roll_or_x = roll_or_x;
-	motion.pitch_or_y = pitch_or_y;
-	motion.thr_z = thr_z;
-	motion.yaw = yaw;
-	while(true)
-	{
-		if(cmd_complete)
-		{
-			cmd_complete = false;
-			App_Send_Data(0, 0, MY_CTRL_CMD_SET, API_CTRL_REQUEST, (uint8_t*)&motion, sizeof(motion), NULL, 0, 0); // send command
-			cmd_complete = true;
-			break;
-		}
-	}
-}
-
-/*
- * guidance callback function
- */
 
 int guidance_callback(int data_type, int data_len, char *content)
 {
@@ -657,8 +483,8 @@ int guidance_callback(int data_type, int data_len, char *content)
 		waitKey(1);
 
 		// maneuver
-		if(ctrl_strat != NONE)
-		{
+		//if(ctrl_strat != NONE)
+		//{
 			double x = (l_fwd + r_fwd)/2.0;
 			double y = 0;
 			double z = (l_alt + r_alt)/2.0;
@@ -666,8 +492,8 @@ int guidance_callback(int data_type, int data_len, char *content)
 				z = 0;
 			#endif
 			double yaw = (l_turn + r_turn)/2.0;
-			maneuver(CMD_FLAG, x, y, z, yaw);
-		}
+			flight->control(CMD_FLAG, x, y, z, yaw);
+		//}
 	}
 
 	g_lock.leave();
@@ -676,47 +502,20 @@ int guidance_callback(int data_type, int data_len, char *content)
 	return 0;
 }
 
-// opening and closing api
-void nav_open_close(uint8_t open_close, char *task)
-{
-	uint8_t send_data = open_close;
-	while(true)
-	{
-		if(cmd_complete)
-		{
-			printf("\n%s\n", task);
-			cmd_complete = false;
-			App_Send_Data(1, 1, MY_CTRL_CMD_SET, API_OPEN_SERIAL, (uint8_t *)&send_data, sizeof(send_data), sdk_ack_nav_open_close_callback,  1000, 0); // send command
-			break;
-		}
-	}
-}
 
-// takeoff and landing
-void take_off_land(uint8_t send_data, char *task)
-{
-	while(true)
-	{
-		if(cmd_complete)
-		{
-			printf("\n%s\n", task);
-			cmd_complete = false; // reset cmd_complete
-			App_Complex_Send_Cmd(send_data, cmd_callback_test_fun); // send command
-			break;
-		}
-	}
-}
 
-// run mission
-void run()
-{
+
+void run() {
+
+	/* Request Control */
+	coreAPI->setControl(1);
 	/* Takeoff */
-	test_activation(); // activate
-	nav_open_close(1, (char *)"Opening API Control..."); // open api
-	take_off_land(TAKEOFF, (char *)"Taking off..."); // take off
+	usleep(2000000);// wait for 2 seconds
+	flight->task(Flight::TASK_TAKEOFF);
+	printf("\nTaking off...\n");
 
 	/* Maneuvering and avoiding obstacles */
-	usleep(15000000); // pause 15 seconds
+	usleep(1000000); // wait for 1 second
 	printf("\nBeginning Obstacle Avoidance...\n");
 	err_code = start_transfer(); // start guidance data collection
 	RETURN_IF_ERR( err_code );
@@ -726,57 +525,69 @@ void run()
 	printf("\nEnding Obstacle Avoidance...\n");
 	err_code = stop_transfer(); // stop guidance
 	RETURN_IF_ERR( err_code );
-	monitor();
-	while(recv_sdk_std_msgs.pos.height > 0) // check if drone reached ground level yet
-	{
-		take_off_land(LAND, (char *)"Landing..."); // land
-		monitor();
-	}
-	nav_open_close(0, (char *)"Closing API Control..."); // close api
+	
+	bc_data = coreAPI->getBroadcastData();
+	
+	printf("\nLanding...\n");
+
+	flight->task(Flight::TASK_LANDING); // land
+	usleep(1000000);
+	
+	/* Release Control */
+	coreAPI->setControl(0);	
 }
 
-/*
-  * main_function
-  */
-int main (int argc, char** argv)
-{
-	/* Onboard */
 
+void* APIRecvThread(void* param) {
+
+            CoreAPI* p_coreAPI = (CoreAPI*)param;
+            while(true) {
+                p_coreAPI->readPoll();
+                p_coreAPI->sendPoll();
+                usleep(1000);
+            }
+	return nullptr;
+        }
+
+
+int main (int argc, char** argv)
+{	
+        
+	/* OnboardSDK Initialization */
 	printf("Test SDK Protocol demo\n");
 
-	serial_name = std::string("/dev/ttyUSB0");
+	serial_name = std::string("/dev/ttyTHS1");
 	baud_rate = 230400;
-	app_id = 1010572;
+	app_id = 1027749;
 	app_api_level = 2;
 	app_version = 1;
-	app_bundle_id = std::string("12345678901234567890123456789012");
-	enc_key = std::string("ca5aed46d675076dd100ec73a8d3b8d3dbeea66392c77af62ac65cf9b5be8520");
+	enc_key = std::string("5de4dfff4bea190522bd6d9bb7da434a213c5e30611a8d5f01c8ed1146e1712a");
+ 
+	user_act_data.ID = app_id;
+	user_act_data.version = (uint32_t)0x03010a00;// M100
+	user_act_data.encKey = app_key;
+    	strcpy(user_act_data.encKey, enc_key.c_str());
 
-	activation_msg.app_id 		= (uint32_t)app_id;
-	activation_msg.app_api_level 	= (uint32_t)app_api_level;
-	activation_msg.app_ver		= (uint32_t)app_version;
-	memcpy(activation_msg.app_bundle_id, app_bundle_id.c_str(), 32);
+    	printf("=================================================\n");
+    	printf("app id: %d\n", user_act_data.ID);
+    	printf("app version: 0x0%X\n", user_act_data.version);
+    	printf("app key: %s\n", user_act_data.encKey);
+    	printf("=================================================\n");
 	
-	key = (char*)enc_key.c_str();
+	m_hd = new HardDriver_Manifold(serial_name, baud_rate);
+	m_hd->init();
+	coreAPI = new CoreAPI( (HardDriver*)m_hd );
+	coreAPI->setVersion(user_act_data.version);
 	
-	printf("[INIT] SET serial_port	: %s \n", serial_name.c_str());
-	printf("[INIT] SET baud_rate	: %d \n", baud_rate);
-	printf("[INIT] ACTIVATION INFO	: \n");
-	printf("[INIT] 	  app_id     	  %d \n", activation_msg.app_id);
-	printf("[INIT]    app_api_level	  %d \n", activation_msg.app_api_level);
-	printf("[INIT]    app_version     %d \n", activation_msg.app_ver);
-	printf("[INIT]    app_bundle_id	  %s \n", activation_msg.app_bundle_id);
-	printf("[INIT]    enc_key	  %s \n", key);
+        ret = pthread_create(&m_recvTid, 0, APIRecvThread, (void *)coreAPI);
+	if(0 != ret)
+                cout << "Cannot create new thread for readPoll!"<< endl;
+            else
+                cout << "Succeed to create thread for readPoll"<< endl;
+        
+	coreAPI->activate(&user_act_data,NULL);
 
-	/* open serial port */
-	Pro_Hw_Setup((char *)serial_name.c_str(),baud_rate);
-	Pro_Link_Setup();
-	App_Recv_Set_Hook(App_Recv_Req_Data);
-	App_Set_Table(set_handler_tab, cmd_handler_tab);
-
-	CmdStartThread();
-
-	Pro_Config_Comm_Encrypt_Key(key);
+	flight = new Flight(coreAPI);
 
 	/* Guidance */
 
@@ -792,8 +603,7 @@ int main (int argc, char** argv)
 	err_code = set_sdk_event_handler( guidance_callback ); // set guidance callback
 	RETURN_IF_ERR( err_code );
 	
-	/* Mission */
-	
+	/* Mission */	
 	printf("\nRunning Mission...\n");
 	run();
 
