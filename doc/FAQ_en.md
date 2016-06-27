@@ -1,3 +1,5 @@
+#### This documentation is now deprecated, please refer to <https://developer.dji.com/guidance-sdk/documentation/faq/index.html> in DJI Developer Website.
+
 # FAQ
 
 ## What information is provided by Guidance SDK? 

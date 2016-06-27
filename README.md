@@ -4,20 +4,19 @@
 　[中文版本](#中文版本)
 
 ## English Version
+
 Official Guidance SDK package for accessing the rich categories of output data from Guidance via USB and UART, and configure your Guidance all by your demand.
 
 ### Document
 
-　[Developer Guide](doc/Guides/Developer_Guide/en/DeveloperGuide_en.md)
+ - [Developer Guide](https://developer.dji.com/guidance-sdk/documentation/application-development-guides/index.html)
 
-　[Run Example](doc/Guides/RunExample/runExample.md)
+ - [Run Example](https://developer.dji.com/guidance-sdk/documentation/quick-start/run-examples.html)
 
-　[Build a Visual Tracking Project](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_en.md)
+ - [Build a Visual Tracking Project](https://developer.dji.com/guidance-sdk/documentation/tutorials/index.html)
 
-　[API Documentation](doc/Guidance_SDK_API/Guidance_SDK_API_en.md)
+ - [API Documentation](https://developer.dji.com/guidance-sdk/documentation/introduction/index.html)
  
-　[FAQ](doc/FAQ_en.md)
-
 ### Structure
 
 -	**demo**: demo applications using Guidance SDK
@@ -51,18 +50,18 @@ Notice that, reading and writing Guidance USB port in Linux requires root author
 
 	sudo sh -c 'echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"fff0\", ATTR{idProduct}==\"d009\", MODE=\"0666\"" > /etc/udev/rules.d/51-guidance.rules'
 
-
 ## 中文版本
 Guidance SDK可以让开发者通过Guidance的USB口和串口来获取丰富的传感器数据，以及按照自己的需要来灵活配置Guidance。
 
 ### 文档
-　[开发者指南](doc/Guides/Developer_Guide/cn/DeveloperGuide_cn.md)　
 
-　[创建一个视觉跟踪工程](doc/Guides/Visual_Tracking_tutorial/visual_Tracking_tutorial_cn.md)
+- [开发者指南](https://developer.dji.com/guidance-sdk/documentation/cn/application-development-guides/index.html)
+　
+- [例程](https://developer.dji.com/guidance-sdk/documentation/cn/quick-start/run-examples.html)
 
-　[API文档](doc/Guidance_SDK_API/Guidance_SDK_API_cn.md)
+- [创建一个视觉跟踪工程](https://developer.dji.com/guidance-sdk/documentation/cn/tutorials/index.html)
 
-　[FAQ](doc/FAQ_cn.md)
+- [API文档](https://developer.dji.com/guidance-sdk/documentation/cn/introduction/index.html)
 
 ### 结构
 
@@ -84,6 +83,7 @@ Guidance SDK可以让开发者通过Guidance的USB口和串口来获取丰富的
 请注意，为了便于ROS用户的快速下载，我们还维护了一个独立的ROS包。它不包含任何文档和Windows下的库文件，因此具有更小的体积：[Guidance-SDK-ROS](https://github.com/dji-sdk/Guidance-SDK-ROS).
 
 ### 如何使用
+
 #### Windows 
 
 USB和串口的示例代码可以在 *examples/usb\_example* 和 *examples/uart\_example*中找到，其中包含了可直接编译运行的Visual Studio工程。需要将对应的dll文件复制到exe所在目录或Windows系统目录。
@@ -95,6 +95,3 @@ USB和串口的示例代码可以在同样的目录（*examples/usb\_example* �
 注意，在Linux下读写Guidance的USB口需要root权限。为了省去每次运行Guidance SDK程序都要输入`sudo`的麻烦，建议在 `/etc/udev/rules.d` 下添加一个规则文件，即 **doc/51-guidance.rules**. 或者也可以从终端输入下面的这行：
 
 	sudo sh -c 'echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"fff0\", ATTR{idProduct}==\"d009\", MODE=\"0666\"" > /etc/udev/rules.d/51-guidance.rules'
-
-
-

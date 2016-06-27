@@ -1,3 +1,5 @@
+#### 本文档已停止维护, 请移步到DJI开发者官网的 <https://developer.dji.com/guidance-sdk/documentation/cn/faq/index.html> 查看最新版本. 
+
 # FAQ
 
 ## Guidance SDK 包含些什么内容？
