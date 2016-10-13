@@ -50,6 +50,10 @@ Notice that, reading and writing Guidance USB port in Linux requires root author
 
 	sudo sh -c 'echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"fff0\", ATTR{idProduct}==\"d009\", MODE=\"0666\"" > /etc/udev/rules.d/51-guidance.rules'
 
+### Learn More about DJI Products and the Guidance SDK
+
+Please visit [DJI Guidance SDK Documentation](https://developer.dji.com/guidance-sdk/documentation/introduction/index.html) for more details.
+
 ## 中文版本
 Guidance SDK可以让开发者通过Guidance的USB口和串口来获取丰富的传感器数据，以及按照自己的需要来灵活配置Guidance。
 
@@ -95,3 +99,7 @@ USB和串口的示例代码可以在同样的目录（*examples/usb\_example* �
 注意，在Linux下读写Guidance的USB口需要root权限。为了省去每次运行Guidance SDK程序都要输入`sudo`的麻烦，建议在 `/etc/udev/rules.d` 下添加一个规则文件，即 **doc/51-guidance.rules**. 或者也可以从终端输入下面的这行：
 
 	sudo sh -c 'echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"fff0\", ATTR{idProduct}==\"d009\", MODE=\"0666\"" > /etc/udev/rules.d/51-guidance.rules'
+
+### 了解更多
+
+请访问[DJI Guidance SDK Documentation](https://developer.dji.com/guidance-sdk/documentation/introduction/index.html)以了解更多。
