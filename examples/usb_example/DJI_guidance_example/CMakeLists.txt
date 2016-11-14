@@ -5,9 +5,17 @@ find_package( OpenCV )
 if(OpenCV_FOUND)
 	add_definitions(-DHAVE_OPENCV)
 endif()
+
 add_executable( dji_guidance_usb main.cpp DJI_utility.cpp )
 include_directories($(SOURCE_DIR)/../../../include)
-find_library(Guidance_Lib DJI_guidance.lib HINTS $(SOURCE_DIR)/../../../../lib/2013/x86)
+
+if(WIN32)
+	find_library(Guidance_Lib DJI_guidance.lib HINTS $(SOURCE_DIR)/../../../../lib/2013/x86)
+else()
+	find_library(Guidance_Lib DJI_guidance HINTS $(SOURCE_DIR)/../../../../so/x64)
+	target_link_libraries( dji_guidance_usb pthread)
+endif()
+
 if(OpenCV_FOUND)
 	target_link_libraries( dji_guidance_usb ${OpenCV_LIBS} ${Guidance_Lib})
 else()
