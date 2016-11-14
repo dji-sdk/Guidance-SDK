@@ -1,13 +1,14 @@
 # Obstacle Bypass
 
-This demo project performs a fully autonomous flight, with online obstacle avoidance algorithms, using image output from **Guidance SDK** to detect obstacles and implement avoidance strategy via control input to **Onboard SDK**.
+This demo project performs a fully autonomous flight, with online obstacle avoidance algorithms, using image output from **Guidance SDK** to detect obstacles and implement avoidance strategy via control input to **Onboard SDK**. This project is build on **ROS**. It contains three different strategies, each working independently.
 
 ## How To Run
 
-1. Enter the directory of the desired strategy in Terminal: `cd balance_strategy` or `cd discontinuity_strategy`
-2. Build the project: `catkin_make`
-3. Execute project: `sudo ./devel/lib/dji_sdk/dji_sdk_node`
-4. Press Enter to end autonomous flight
+1. Install and configure ROS.
+2. Put the directory of the desired strategy in catkin workspace.
+3. Build the project: `catkin_make`
+4. Execute project: `sudo ./devel/lib/dji_sdk/dji_sdk_node`
+5. Press Enter to end autonomous flight
 
 ## Output Data
 
